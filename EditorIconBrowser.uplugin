@@ -1,0 +1,23 @@
+﻿{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "EditorIconBrowser",
+  "Description": "",
+  "Category": "Other",
+  "CreatedBy": "sirjofri",
+  "CreatedByURL": "https://sirjofri.de",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "EditorIconBrowser",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
