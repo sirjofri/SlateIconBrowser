@@ -22,12 +22,23 @@ private:
 	void InputTextChanged(const FText& Text);
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 
+	FString TranslateDefaultStyleSets(FName StyleSet);
+	void FillDefaultStyleSetCodes();
+
+	void CacheAllStyleNames();
 	void CacheAllLines();
 
 	TArray<TSharedPtr<FName>> Lines;
 	TArray<FString> AllLines;
 
+	TArray<TSharedPtr<FName>> AllStyles;
+	FName SelectedStyle;
+
 private:
-	TSharedPtr<class FUICommandList> PluginCommands;
 	TSharedPtr<SListView<TSharedPtr<FName>>> ListView;
+	TSharedPtr<SComboBox<TSharedPtr<FName>>> StyleSelectionComboBox;
+
+	TMap<FName,FString> DefaultStyleSetCode;
+
+	FString FilterText;
 };
