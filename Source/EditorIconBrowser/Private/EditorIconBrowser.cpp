@@ -12,6 +12,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Styling/UMGCoreStyle.h"
+#include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 static const FName EditorIconBrowserTabName("EditorIconBrowser");
@@ -40,15 +41,47 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 {
 	CacheAllStyleNames();
 	FillDefaultStyleSetCodes();
-	SelectedStyle = FEditorStyle::Get().GetStyleSetName();
-	FilterText = TEXT("");
 	CacheAllLines();
+
 
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
 		[
 			// Put your tab content here!
 			SNew(SVerticalBox)
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				MakeMainMenu()
+			]
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				SNew(SHorizontalBox)
+				.Visibility_Lambda([&]
+				{
+					return GetConfig()->CopyCodeStyle == CS_CustomStyle ? EVisibility::Visible : EVisibility::Collapsed;
+				})
+				+SHorizontalBox::Slot()
+				.AutoWidth()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("CustomStyleTextFieldLabel", "Custom Style:"))
+					.Margin(FMargin(10, 5))
+				]
+				+SHorizontalBox::Slot()
+				.FillWidth(1.f)
+				[
+					SNew(SEditableTextBox)
+					.HintText(LOCTEXT("CustomStyleTextFieldHint", "$1 will be replaced by the icon name"))
+					.OnTextCommitted(FOnTextCommitted::CreateLambda([&](const FText& Text, ETextCommit::Type Arg)
+					{
+						GetConfig()->CustomStyle = Text.ToString();
+						GetConfig()->SaveConfig();
+						CopyNoteTextBlock->Invalidate(EInvalidateWidgetReason::Paint);
+					}))
+				]
+			]
 			+SVerticalBox::Slot()
 			.AutoHeight()
 			[
@@ -59,7 +92,8 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 					SAssignNew(StyleSelectionComboBox, SComboBox<TSharedPtr<FName>>)
 					.OnSelectionChanged_Lambda([&](TSharedPtr<FName> InItem, ESelectInfo::Type InSelectionInfo)
 					{
-						SelectedStyle = *InItem.Get();
+						GetConfig()->SelectedStyle = *InItem.Get();
+						GetConfig()->SaveConfig();
 						CacheAllLines();
 					})
 					.OptionsSource(&AllStyles)
@@ -68,7 +102,7 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 						return SNew(STextBlock).Text(FText::FromName(*InItem.Get()));
 					})
 					[
-						SNew(STextBlock).Text_Lambda([=]{ return FText::FromName(SelectedStyle); })
+						SNew(STextBlock).Text_Lambda([=]{ return FText::FromName(GetConfig()->SelectedStyle); })
 					]
 				]
 				+SHorizontalBox::Slot()
@@ -77,6 +111,10 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 					SNew(SEditableTextBox)
 					.HintText(LOCTEXT("SearchHintText", "Search"))
 					.OnTextChanged(FOnTextChanged::CreateRaw(this, &FEditorIconBrowserModule::InputTextChanged))
+					.Text_Lambda([&]
+					{
+						return FText::FromString(GetConfig()->FilterString);
+					})
 				]
 			]
 			+SVerticalBox::Slot()
@@ -118,11 +156,107 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 				.BorderImage(FAppStyle::Get().GetBrush("Brushes.Panel"))
 				.Padding(FMargin(10, 5))
 				[
-					SNew(STextBlock)
-					.Text(LOCTEXT("CopyNote", "Double click a line to copy the FSlateIcon C++ code."))
+					SAssignNew(CopyNoteTextBlock, STextBlock)
+					.Text_Lambda([&]
+					{
+						return FText::Format(LOCTEXT("CopyNote", "Double click a line to copy the {0} C++ code."),
+							GetCodeStyleText(GetConfig()->CopyCodeStyle));
+					})
 				]
 			]
 		];
+}
+
+void FEditorIconBrowserModule::SelectCodeStyle(ECopyCodeStyle CopyStyle)
+{
+	GetConfig()->CopyCodeStyle = CopyStyle;
+	GetConfig()->SaveConfig();
+	CopyNoteTextBlock->Invalidate(EInvalidateWidgetReason::Paint);
+}
+
+FText FEditorIconBrowserModule::GetCodeStyleText(ECopyCodeStyle CopyStyle)
+{
+	switch (CopyStyle) {
+	case CS_FSlateIcon:
+		return FText::FromString(TEXT("FSlateIcon(...)"));
+		break;
+	case CS_FSlateIconFinderFindIcon:
+		return FText::FromString(TEXT("FSlateIconFinder::FindIcon(...)"));
+		break;
+	case CS_CustomStyle:
+		return FText::FromString(GetConfig()->CustomStyle.IsEmpty() ? TEXT("(Custom)") : GetConfig()->CustomStyle);
+		break;
+	}
+	return FText::GetEmpty();
+}
+
+FText FEditorIconBrowserModule::GetCodeStyleTooltip(ECopyCodeStyle CopyStyle)
+{
+	return FText::Format(LOCTEXT("CopyStyleTooltip", "Copy code in {0} style"), GetCodeStyleText(CopyStyle));
+}
+
+void FEditorIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
+{
+	MenuBuilder.BeginSection(TEXT("CopySettings"), LOCTEXT("CopySettings", "Code to copy"));
+	{
+		MenuBuilder.AddMenuEntry(
+			GetCodeStyleText(CS_FSlateIcon),
+			GetCodeStyleTooltip(CS_FSlateIcon),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FEditorIconBrowserModule::SelectCodeStyle, CS_FSlateIcon),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([&]
+				{
+					return GetConfig()->CopyCodeStyle == CS_FSlateIcon;
+				})
+			),
+			NAME_None,
+			EUserInterfaceActionType::RadioButton);
+		MenuBuilder.AddMenuEntry(
+			GetCodeStyleText(CS_FSlateIconFinderFindIcon),
+			GetCodeStyleTooltip(CS_FSlateIconFinderFindIcon),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FEditorIconBrowserModule::SelectCodeStyle, CS_FSlateIconFinderFindIcon),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([&]
+				{
+					return GetConfig()->CopyCodeStyle == CS_FSlateIconFinderFindIcon;
+				})
+			),
+			NAME_None,
+			EUserInterfaceActionType::RadioButton);
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("CustomStyle", "Custom style..."),
+			LOCTEXT("CustomStyleTooltip", "Specify a custom style for copying a code snippet"),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FEditorIconBrowserModule::SelectCodeStyle, CS_CustomStyle),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([&]
+				{
+					return GetConfig()->CopyCodeStyle == CS_CustomStyle;
+				})
+			),
+			NAME_None,
+			EUserInterfaceActionType::RadioButton);
+	}
+	MenuBuilder.EndSection();
+}
+
+TSharedRef<SWidget> FEditorIconBrowserModule::MakeMainMenu()
+{
+	FMenuBarBuilder MenuBuilder(nullptr);
+	{
+		MenuBuilder.AddPullDownMenu(
+			LOCTEXT("SettingsMenu", "Settings"),
+			LOCTEXT("SettingsMenuTooltip", "Opens the settings menu"),
+			FNewMenuDelegate::CreateRaw(this, &FEditorIconBrowserModule::FillSettingsMenu));
+	}
+	TSharedRef<SWidget> Widget = MenuBuilder.MakeWidget();
+	Widget->SetVisibility(EVisibility::Visible);
+	return Widget;
 }
 
 FString FEditorIconBrowserModule::TranslateDefaultStyleSets(FName StyleSet)
@@ -160,7 +294,7 @@ void FEditorIconBrowserModule::CacheAllStyleNames()
 
 void FEditorIconBrowserModule::CacheAllLines()
 {
-	const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(SelectedStyle);
+	const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle);
 	check(Style);
 	TSet<FName> keys = Style->GetStyleKeys();
 
@@ -173,12 +307,17 @@ void FEditorIconBrowserModule::CacheAllLines()
 			continue;
 		AllLines.Add(key.ToString());
 	}
-	InputTextChanged(FText::FromString(FilterText));
+	InputTextChanged(FText::FromString(GetConfig()->FilterString));
 }
 
-void FEditorIconBrowserModule::CopyIconCodeToClipboard(FName Name)
+UEditorIconBrowserUserSettings* FEditorIconBrowserModule::GetConfig()
 {
-	FString CopyText = FString::Printf(TEXT("FSlateIcon(%s, \"%s\")"), *TranslateDefaultStyleSets(SelectedStyle), *Name.ToString());
+	return GetMutableDefault<UEditorIconBrowserUserSettings>();
+}
+
+void FEditorIconBrowserModule::CopyIconCodeToClipboard(FName Name, ECopyCodeStyle CodeStyle)
+{
+	FString CopyText = GenerateCopyCode(Name, CodeStyle);
 	FPlatformApplicationMisc::ClipboardCopy(*CopyText);
 	UE_LOG(LogTemp, Warning, TEXT("Copy code to clipboard: %s"), *CopyText);
 
@@ -188,10 +327,76 @@ void FEditorIconBrowserModule::CopyIconCodeToClipboard(FName Name)
 	FSlateNotificationManager::Get().AddNotification(Info);
 }
 
+FString FEditorIconBrowserModule::GenerateCopyCode(FName Name, ECopyCodeStyle CodeStyle)
+{
+	FString CopyText(TEXT(""));
+	switch (CodeStyle) {
+	case CS_FSlateIcon:
+		CopyText = FString::Printf(TEXT("FSlateIcon(%s, \"%s\")"), *TranslateDefaultStyleSets(GetConfig()->SelectedStyle), *Name.ToString());
+		break;
+	case CS_FSlateIconFinderFindIcon:
+		CopyText = FString::Printf(TEXT("FSlateIconFinder::FindIcon(FName(\"%s\"))"), *Name.ToString());
+		break;
+	case CS_CustomStyle:
+		CopyText = GetConfig()->CustomStyle.Replace(TEXT("$1"), *Name.ToString());
+		break;
+	}
+	return CopyText;
+}
+
+FReply FEditorIconBrowserModule::EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FName Name)
+{
+	if (PointerEvent.GetEffectingButton() != EKeys::RightMouseButton)
+		return FReply::Unhandled();
+
+	if (PointerEvent.GetEventPath() == nullptr)
+		return FReply::Unhandled();
+
+	FString CopyCode;
+	auto Clipboard = [&](FName N, ECopyCodeStyle Style)
+	{
+		CopyIconCodeToClipboard(N, Style);
+	};
+
+	FMenuBuilder MenuBuilder(true, nullptr);
+	MenuBuilder.BeginSection("CopyOptions", LOCTEXT("CopyCodeOptions", "Copy Code"));
+	{
+		CopyCode = GenerateCopyCode(Name, CS_FSlateIcon);
+		MenuBuilder.AddMenuEntry(
+			FText::FromString(CopyCode),
+			FText::GetEmpty(),
+			FSlateIcon(),
+			FUIAction(FExecuteAction::CreateLambda(Clipboard, Name, CS_FSlateIcon)));
+		CopyCode = GenerateCopyCode(Name, CS_FSlateIconFinderFindIcon);
+		MenuBuilder.AddMenuEntry(
+			FText::FromString(CopyCode),
+			FText::GetEmpty(),
+			FSlateIcon(),
+			FUIAction(FExecuteAction::CreateLambda(Clipboard, Name, CS_FSlateIconFinderFindIcon)));
+		
+		if (!GetConfig()->CustomStyle.IsEmpty()) {
+			CopyCode = GenerateCopyCode(Name, CS_CustomStyle);
+			MenuBuilder.AddMenuEntry(
+				FText::FromString(CopyCode),
+				FText::GetEmpty(),
+				FSlateIcon(),
+				FUIAction(FExecuteAction::CreateLambda(Clipboard, Name, CS_CustomStyle)));
+		}
+	}
+	MenuBuilder.EndSection();
+
+	TSharedPtr<SWidget> MenuWidget = MenuBuilder.MakeWidget();
+	FWidgetPath WidgetPath = *PointerEvent.GetEventPath();
+	const FVector2D& Location = PointerEvent.GetScreenSpacePosition();
+	FSlateApplication::Get().PushMenu(WidgetPath.Widgets.Last().Widget, WidgetPath, MenuWidget.ToSharedRef(), Location, FPopupTransitionEffect(FPopupTransitionEffect::ContextMenu));
+			
+	return FReply::Handled();
+}
+
 TSharedRef<ITableRow> FEditorIconBrowserModule::GenerateRow(TSharedPtr<FName> Name,
                                                             const TSharedRef<STableViewBase>& TableViewBase)
 {
-	auto Brush = FSlateStyleRegistry::FindSlateStyle(SelectedStyle)->GetOptionalBrush(*Name.Get());
+	auto Brush = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle)->GetOptionalBrush(*Name.Get());
 	FVector2D DesiredIconSize = Brush->GetImageSize();
 	if (Brush->GetImageType() == ESlateBrushImageType::NoImage)
 		DesiredIconSize = FVector2D(20);
@@ -201,9 +406,10 @@ TSharedRef<ITableRow> FEditorIconBrowserModule::GenerateRow(TSharedPtr<FName> Na
 		SNew(SBorder)
 		.OnMouseDoubleClick_Lambda([&](const FGeometry& Geometry, const FPointerEvent& PointerEvent, FName N)
 		{
-			CopyIconCodeToClipboard(N);
+			CopyIconCodeToClipboard(N, GetConfig()->CopyCodeStyle);
 			return FReply::Handled();
 		}, *Name.Get())
+		.OnMouseButtonUp_Raw(this, &FEditorIconBrowserModule::EntryContextMenu, *Name.Get())
 		[
 			SNew(SHorizontalBox)
 			+SHorizontalBox::Slot()
@@ -228,10 +434,11 @@ TSharedRef<ITableRow> FEditorIconBrowserModule::GenerateRow(TSharedPtr<FName> Na
 
 void FEditorIconBrowserModule::InputTextChanged(const FText& Text)
 {
-	FilterText = Text.ToString();
+	GetConfig()->FilterString = Text.ToString();
+	GetConfig()->SaveConfig();
 	Lines.Empty(AllLines.Num());
 	
-	if (FilterText.IsEmpty()) {
+	if (GetConfig()->FilterString.IsEmpty()) {
 		for (FString s : AllLines)
 			Lines.Add(MakeShareable(new FName(s)));
 		if (ListView.IsValid())
@@ -239,7 +446,7 @@ void FEditorIconBrowserModule::InputTextChanged(const FText& Text)
 		return;
 	}
 	for (FString s : AllLines) {
-		if (s.Contains(FilterText))
+		if (s.Contains(GetConfig()->FilterString))
 			Lines.Add(MakeShareable(new FName(s)));
 		if (ListView.IsValid())
 			ListView.Get()->RequestListRefresh();
