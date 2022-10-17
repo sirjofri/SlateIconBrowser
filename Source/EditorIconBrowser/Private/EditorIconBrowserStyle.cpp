@@ -41,7 +41,7 @@ TSharedRef< FSlateStyleSet > FEditorIconBrowserStyle::Create()
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("EditorIconBrowserStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("EditorIconBrowser")->GetBaseDir() / TEXT("Resources"));
 
-	Style->Set("EditorIconBrowser.OpenPluginWindow", new IMAGE_BRUSH_SVG(TEXT("PlaceholderButtonIcon"), Icon20x20));
+	Style->Set("EditorIconBrowser.OpenPluginWindow", new IMAGE_BRUSH_SVG(TEXT("Icon"), Icon20x20));
 
 	return Style;
 }
