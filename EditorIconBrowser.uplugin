@@ -9,6 +9,7 @@
   "CreatedByURL": "https://sirjofri.de",
   "DocsURL": "",
   "MarketplaceURL": "",
+  "EngineVersion": "5.0.0",
   "CanContainContent": false,
   "IsBetaVersion": false,
   "IsExperimentalVersion": false,
@@ -17,7 +18,8 @@
     {
       "Name": "EditorIconBrowser",
       "Type": "Editor",
-      "LoadingPhase": "Default"
+      "LoadingPhase": "Default",
+      "WhitelistPlatforms": [ "Win64" ]
     }
   ]
 }

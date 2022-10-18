@@ -12,6 +12,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Styling/UMGCoreStyle.h"
+#include "Widgets/Layout/SExpandableArea.h"
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
@@ -57,30 +58,46 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 			+SVerticalBox::Slot()
 			.AutoHeight()
 			[
-				SNew(SHorizontalBox)
-				.Visibility_Lambda([&]
-				{
-					return GetConfig()->CopyCodeStyle == CS_CustomStyle ? EVisibility::Visible : EVisibility::Collapsed;
-				})
-				+SHorizontalBox::Slot()
-				.AutoWidth()
+				SNew(SExpandableArea)
+				.InitiallyCollapsed(true)
+				.HeaderContent()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("CustomStyleTextFieldLabel", "Custom Style:"))
-					.Margin(FMargin(10, 5))
+					.Text(LOCTEXT("CustomStyleExpandHeader", "Custom Style"))
 				]
-				+SHorizontalBox::Slot()
-				.FillWidth(1.f)
+				.BodyContent()
 				[
-					SNew(SEditableTextBox)
-					.HintText(LOCTEXT("CustomStyleTextFieldHint", "$1 will be replaced by the icon name"))
-					.OnTextCommitted(FOnTextCommitted::CreateLambda([&](const FText& Text, ETextCommit::Type Arg)
-					{
-						GetConfig()->CustomStyle = Text.ToString();
-						GetConfig()->SaveConfig();
-						CopyNoteTextBlock->Invalidate(EInvalidateWidgetReason::Paint);
-					}))
+					SNew(SHorizontalBox)
+					+SHorizontalBox::Slot()
+					.AutoWidth()
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("CustomStyleTextFieldLabel", "Custom Code Style:"))
+						.Margin(FMargin(10, 5))
+					]
+					+SHorizontalBox::Slot()
+					.FillWidth(1.f)
+					[
+						SNew(SEditableTextBox)
+						.HintText(LOCTEXT("CustomStyleTextFieldHint", "$1 will be replaced by the icon name"))
+						.Text_Lambda([&]
+						{
+							return FText::FromString(GetConfig()->CustomStyle);
+						})
+						.OnTextCommitted(FOnTextCommitted::CreateLambda([&](const FText& Text, ETextCommit::Type Arg)
+						{
+							GetConfig()->CustomStyle = Text.ToString();
+							GetConfig()->SaveConfig();
+							CopyNoteTextBlock->Invalidate(EInvalidateWidgetReason::Paint);
+						}))
+					]
 				]
+			]
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				SNew(SSeparator)
+				.Orientation(EOrientation::Orient_Horizontal)
 			]
 			+SVerticalBox::Slot()
 			.AutoHeight()
