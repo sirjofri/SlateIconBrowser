@@ -271,11 +271,11 @@ void FSlateIconBrowserModule::FillHelpMenu(FMenuBuilder& MenuBuilder)
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("HelpDocumentation", "Documentation"),
 			LOCTEXT("HelpDocumentationTooltip", "Opens the documentation"),
-			FSlateIcon(),
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Documentation"),
 			FUIAction(
 				FExecuteAction::CreateLambda([=]
 				{
-					FPlatformProcess::LaunchURL(TEXT("http://sirjofri.de"), nullptr, nullptr);
+					FPlatformProcess::LaunchURL(TEXT("https://github.com/sirjofri/SlateIconBrowser"), nullptr, nullptr);
 				})
 			));
 	}
@@ -376,7 +376,7 @@ FString FSlateIconBrowserModule::GenerateCopyCode(FName Name, ECopyCodeStyle Cod
 		CopyText = FString::Printf(TEXT("FSlateIcon(%s, \"%s\")"), *TranslateDefaultStyleSets(GetConfig()->SelectedStyle), *Name.ToString());
 		break;
 	case CS_FSlateIconFinderFindIcon:
-		CopyText = FString::Printf(TEXT("FSlateIconFinder::FindIcon(FName(\"%s\"))"), *Name.ToString());
+		CopyText = FString::Printf(TEXT("FSlateIconFinder::FindIcon(\"%s\")"), *Name.ToString());
 		break;
 	case CS_CustomStyle:
 		CopyText = GetConfig()->CustomStyle.Replace(TEXT("$1"), *Name.ToString());
