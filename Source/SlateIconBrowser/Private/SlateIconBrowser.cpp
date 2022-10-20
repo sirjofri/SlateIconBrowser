@@ -1,7 +1,7 @@
 ﻿// Copyright sirjofri. Licensed under MIT license. See License.txt for full license text.
 
-#include "EditorIconBrowser.h"
-#include "EditorIconBrowserStyle.h"
+#include "SlateIconBrowser.h"
+#include "SlateIconBrowserStyle.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "LevelEditor.h"
 #include "UMGStyle.h"
@@ -16,34 +16,34 @@
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
-static const FName EditorIconBrowserTabName("EditorIconBrowser");
+static const FName SlateIconBrowserTabName("SlateIconBrowser");
 
-#define LOCTEXT_NAMESPACE "FEditorIconBrowserModule"
+#define LOCTEXT_NAMESPACE "FSlateIconBrowserModule"
 
-void FEditorIconBrowserModule::StartupModule()
+void FSlateIconBrowserModule::StartupModule()
 {
-	FEditorIconBrowserStyle::Initialize();
-	FEditorIconBrowserStyle::ReloadTextures();
+	FSlateIconBrowserStyle::Initialize();
+	FSlateIconBrowserStyle::ReloadTextures();
 
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(EditorIconBrowserTabName, FOnSpawnTab::CreateRaw(this, &FEditorIconBrowserModule::OnSpawnPluginTab))
-		.SetDisplayName(LOCTEXT("FEditorIconBrowserTabTitle", "Editor Icon Browser"))
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(SlateIconBrowserTabName, FOnSpawnTab::CreateRaw(this, &FSlateIconBrowserModule::OnSpawnPluginTab))
+		.SetDisplayName(LOCTEXT("FSlateIconBrowserTabTitle", "Slate Icon Browser"))
 		.SetGroup(WorkspaceMenu::GetMenuStructure().GetToolsCategory())
-		.SetIcon(FSlateIcon(FEditorIconBrowserStyle::GetStyleSetName(), "EditorIconBrowser.OpenPluginWindow"))
+		.SetIcon(FSlateIcon(FSlateIconBrowserStyle::GetStyleSetName(), "SlateIconBrowser.Icon"))
 		.SetMenuType(ETabSpawnerMenuType::Enabled);
 }
 
-void FEditorIconBrowserModule::ShutdownModule()
+void FSlateIconBrowserModule::ShutdownModule()
 {
-	FEditorIconBrowserStyle::Shutdown();
-	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(EditorIconBrowserTabName);
+	FSlateIconBrowserStyle::Shutdown();
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(SlateIconBrowserTabName);
 }
 
-TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
+TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
+	MakeValidConfiguration();
 	CacheAllStyleNames();
 	FillDefaultStyleSetCodes();
 	CacheAllLines();
-
 
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
@@ -73,6 +73,7 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 					[
 						SNew(STextBlock)
 						.Text(LOCTEXT("CustomStyleTextFieldLabel", "Custom Code Style:"))
+						.ToolTipText(CustomStyleTooltipText)
 						.Margin(FMargin(10, 5))
 					]
 					+SHorizontalBox::Slot()
@@ -80,6 +81,7 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 					[
 						SNew(SEditableTextBox)
 						.HintText(LOCTEXT("CustomStyleTextFieldHint", "$1 will be replaced by the icon name"))
+						.ToolTipText(CustomStyleTooltipText)
 						.Text_Lambda([&]
 						{
 							return FText::FromString(GetConfig()->CustomStyle);
@@ -127,7 +129,7 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 				[
 					SNew(SEditableTextBox)
 					.HintText(LOCTEXT("SearchHintText", "Search"))
-					.OnTextChanged(FOnTextChanged::CreateRaw(this, &FEditorIconBrowserModule::InputTextChanged))
+					.OnTextChanged(FOnTextChanged::CreateRaw(this, &FSlateIconBrowserModule::InputTextChanged))
 					.Text_Lambda([&]
 					{
 						return FText::FromString(GetConfig()->FilterString);
@@ -142,7 +144,7 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 				.FillHeight(1.0)
 				[
 					SAssignNew(ListView, SListView<TSharedPtr<FName>>)
-					.OnGenerateRow_Raw(this, &FEditorIconBrowserModule::GenerateRow)
+					.OnGenerateRow_Raw(this, &FSlateIconBrowserModule::GenerateRow)
 					.ListItemsSource(&Lines)
 					.SelectionMode(ESelectionMode::Single)
 					.Visibility_Lambda([=]
@@ -184,14 +186,14 @@ TSharedRef<SDockTab> FEditorIconBrowserModule::OnSpawnPluginTab(const FSpawnTabA
 		];
 }
 
-void FEditorIconBrowserModule::SelectCodeStyle(ECopyCodeStyle CopyStyle)
+void FSlateIconBrowserModule::SelectCodeStyle(ECopyCodeStyle CopyStyle)
 {
 	GetConfig()->CopyCodeStyle = CopyStyle;
 	GetConfig()->SaveConfig();
 	CopyNoteTextBlock->Invalidate(EInvalidateWidgetReason::Paint);
 }
 
-FText FEditorIconBrowserModule::GetCodeStyleText(ECopyCodeStyle CopyStyle)
+FText FSlateIconBrowserModule::GetCodeStyleText(ECopyCodeStyle CopyStyle)
 {
 	switch (CopyStyle) {
 	case CS_FSlateIcon:
@@ -207,12 +209,12 @@ FText FEditorIconBrowserModule::GetCodeStyleText(ECopyCodeStyle CopyStyle)
 	return FText::GetEmpty();
 }
 
-FText FEditorIconBrowserModule::GetCodeStyleTooltip(ECopyCodeStyle CopyStyle)
+FText FSlateIconBrowserModule::GetCodeStyleTooltip(ECopyCodeStyle CopyStyle)
 {
 	return FText::Format(LOCTEXT("CopyStyleTooltip", "Copy code in {0} style"), GetCodeStyleText(CopyStyle));
 }
 
-void FEditorIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
+void FSlateIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
 {
 	MenuBuilder.BeginSection(TEXT("CopySettings"), LOCTEXT("CopySettings", "Code to copy"));
 	{
@@ -221,7 +223,7 @@ void FEditorIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
 			GetCodeStyleTooltip(CS_FSlateIcon),
 			FSlateIcon(),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FEditorIconBrowserModule::SelectCodeStyle, CS_FSlateIcon),
+				FExecuteAction::CreateRaw(this, &FSlateIconBrowserModule::SelectCodeStyle, CS_FSlateIcon),
 				FCanExecuteAction(),
 				FIsActionChecked::CreateLambda([&]
 				{
@@ -235,7 +237,7 @@ void FEditorIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
 			GetCodeStyleTooltip(CS_FSlateIconFinderFindIcon),
 			FSlateIcon(),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FEditorIconBrowserModule::SelectCodeStyle, CS_FSlateIconFinderFindIcon),
+				FExecuteAction::CreateRaw(this, &FSlateIconBrowserModule::SelectCodeStyle, CS_FSlateIconFinderFindIcon),
 				FCanExecuteAction(),
 				FIsActionChecked::CreateLambda([&]
 				{
@@ -249,7 +251,7 @@ void FEditorIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
 			LOCTEXT("CustomStyleTooltip", "Specify a custom style for copying a code snippet"),
 			FSlateIcon(),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FEditorIconBrowserModule::SelectCodeStyle, CS_CustomStyle),
+				FExecuteAction::CreateRaw(this, &FSlateIconBrowserModule::SelectCodeStyle, CS_CustomStyle),
 				FCanExecuteAction(),
 				FIsActionChecked::CreateLambda([&]
 				{
@@ -262,21 +264,43 @@ void FEditorIconBrowserModule::FillSettingsMenu(FMenuBuilder& MenuBuilder)
 	MenuBuilder.EndSection();
 }
 
-TSharedRef<SWidget> FEditorIconBrowserModule::MakeMainMenu()
+void FSlateIconBrowserModule::FillHelpMenu(FMenuBuilder& MenuBuilder)
+{
+	MenuBuilder.BeginSection(TEXT("HelpMenu"));
+	{
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("HelpDocumentation", "Documentation"),
+			LOCTEXT("HelpDocumentationTooltip", "Opens the documentation"),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([=]
+				{
+					FPlatformProcess::LaunchURL(TEXT("http://sirjofri.de"), nullptr, nullptr);
+				})
+			));
+	}
+	MenuBuilder.EndSection();
+}
+
+TSharedRef<SWidget> FSlateIconBrowserModule::MakeMainMenu()
 {
 	FMenuBarBuilder MenuBuilder(nullptr);
 	{
 		MenuBuilder.AddPullDownMenu(
 			LOCTEXT("SettingsMenu", "Settings"),
-			LOCTEXT("SettingsMenuTooltip", "Opens the settings menu"),
-			FNewMenuDelegate::CreateRaw(this, &FEditorIconBrowserModule::FillSettingsMenu));
+			LOCTEXT("SettingsMenuTooltip", "Opens the settings menu."),
+			FNewMenuDelegate::CreateRaw(this, &FSlateIconBrowserModule::FillSettingsMenu));
+		MenuBuilder.AddPullDownMenu(
+			LOCTEXT("HelpMenu", "Help"),
+			LOCTEXT("HelpMenuTooltip", "Opens the help menu."),
+			FNewMenuDelegate::CreateRaw(this, &FSlateIconBrowserModule::FillHelpMenu));
 	}
 	TSharedRef<SWidget> Widget = MenuBuilder.MakeWidget();
 	Widget->SetVisibility(EVisibility::Visible);
 	return Widget;
 }
 
-FString FEditorIconBrowserModule::TranslateDefaultStyleSets(FName StyleSet)
+FString FSlateIconBrowserModule::TranslateDefaultStyleSets(FName StyleSet)
 {
 	FString* StrPtr = DefaultStyleSetCode.Find(StyleSet);
 	if (StrPtr)
@@ -284,7 +308,7 @@ FString FEditorIconBrowserModule::TranslateDefaultStyleSets(FName StyleSet)
 	return FString::Printf(TEXT("FName(\"%s\")"), *StyleSet.ToString());
 }
 
-void FEditorIconBrowserModule::FillDefaultStyleSetCodes()
+void FSlateIconBrowserModule::FillDefaultStyleSetCodes()
 {
 #define STYLECODE(A, B) DefaultStyleSetCode.Add(FName(A), TEXT(B));
 	
@@ -296,7 +320,7 @@ void FEditorIconBrowserModule::FillDefaultStyleSetCodes()
 #undef STYLECODE
 }
 
-void FEditorIconBrowserModule::CacheAllStyleNames()
+void FSlateIconBrowserModule::CacheAllStyleNames()
 {
 	AllStyles.Empty(AllStyles.Num());
 	
@@ -309,7 +333,7 @@ void FEditorIconBrowserModule::CacheAllStyleNames()
 	);
 }
 
-void FEditorIconBrowserModule::CacheAllLines()
+void FSlateIconBrowserModule::CacheAllLines()
 {
 	const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle);
 	check(Style);
@@ -327,24 +351,24 @@ void FEditorIconBrowserModule::CacheAllLines()
 	InputTextChanged(FText::FromString(GetConfig()->FilterString));
 }
 
-UEditorIconBrowserUserSettings* FEditorIconBrowserModule::GetConfig()
+USlateIconBrowserUserSettings* FSlateIconBrowserModule::GetConfig()
 {
-	return GetMutableDefault<UEditorIconBrowserUserSettings>();
+	return GetMutableDefault<USlateIconBrowserUserSettings>();
 }
 
-void FEditorIconBrowserModule::CopyIconCodeToClipboard(FName Name, ECopyCodeStyle CodeStyle)
+void FSlateIconBrowserModule::CopyIconCodeToClipboard(FName Name, ECopyCodeStyle CodeStyle)
 {
 	FString CopyText = GenerateCopyCode(Name, CodeStyle);
 	FPlatformApplicationMisc::ClipboardCopy(*CopyText);
 	UE_LOG(LogTemp, Warning, TEXT("Copy code to clipboard: %s"), *CopyText);
 
-	FNotificationInfo Info(LOCTEXT("CopiedNotification", "Slate Icon code copied to clipboard"));
+	FNotificationInfo Info(LOCTEXT("CopiedNotification", "C++ code copied to clipboard"));
 	Info.ExpireDuration = 3.f;
 	Info.SubText = FText::FromString(CopyText);
 	FSlateNotificationManager::Get().AddNotification(Info);
 }
 
-FString FEditorIconBrowserModule::GenerateCopyCode(FName Name, ECopyCodeStyle CodeStyle)
+FString FSlateIconBrowserModule::GenerateCopyCode(FName Name, ECopyCodeStyle CodeStyle)
 {
 	FString CopyText(TEXT(""));
 	switch (CodeStyle) {
@@ -361,7 +385,7 @@ FString FEditorIconBrowserModule::GenerateCopyCode(FName Name, ECopyCodeStyle Co
 	return CopyText;
 }
 
-FReply FEditorIconBrowserModule::EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FName Name)
+FReply FSlateIconBrowserModule::EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FName Name)
 {
 	if (PointerEvent.GetEffectingButton() != EKeys::RightMouseButton)
 		return FReply::Unhandled();
@@ -410,7 +434,7 @@ FReply FEditorIconBrowserModule::EntryContextMenu(const FGeometry& Geometry, con
 	return FReply::Handled();
 }
 
-TSharedRef<ITableRow> FEditorIconBrowserModule::GenerateRow(TSharedPtr<FName> Name,
+TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FName> Name,
                                                             const TSharedRef<STableViewBase>& TableViewBase)
 {
 	auto Brush = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle)->GetOptionalBrush(*Name.Get());
@@ -426,7 +450,7 @@ TSharedRef<ITableRow> FEditorIconBrowserModule::GenerateRow(TSharedPtr<FName> Na
 			CopyIconCodeToClipboard(N, GetConfig()->CopyCodeStyle);
 			return FReply::Handled();
 		}, *Name.Get())
-		.OnMouseButtonUp_Raw(this, &FEditorIconBrowserModule::EntryContextMenu, *Name.Get())
+		.OnMouseButtonUp_Raw(this, &FSlateIconBrowserModule::EntryContextMenu, *Name.Get())
 		[
 			SNew(SHorizontalBox)
 			+SHorizontalBox::Slot()
@@ -449,7 +473,7 @@ TSharedRef<ITableRow> FEditorIconBrowserModule::GenerateRow(TSharedPtr<FName> Na
 	];
 }
 
-void FEditorIconBrowserModule::InputTextChanged(const FText& Text)
+void FSlateIconBrowserModule::InputTextChanged(const FText& Text)
 {
 	GetConfig()->FilterString = Text.ToString();
 	GetConfig()->SaveConfig();
@@ -470,6 +494,12 @@ void FEditorIconBrowserModule::InputTextChanged(const FText& Text)
 	}
 }
 
+void FSlateIconBrowserModule::MakeValidConfiguration()
+{
+	if (GetConfig()->SelectedStyle.IsNone())
+		GetConfig()->SelectedStyle = FEditorStyle::GetStyleSetName();
+}
+
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FEditorIconBrowserModule, EditorIconBrowser)
+IMPLEMENT_MODULE(FSlateIconBrowserModule, EditorIconBrowser)

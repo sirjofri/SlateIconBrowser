@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EditorIconBrowserUserSettings.h"
+#include "SlateIconBrowserUserSettings.h"
 #include "Modules/ModuleManager.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;
 
-class FEditorIconBrowserModule : public IModuleInterface
+class FSlateIconBrowserModule : public IModuleInterface
 {
 public:
 
@@ -29,6 +29,7 @@ private:
 	FText GetCodeStyleText(ECopyCodeStyle CopyStyle);
 	FText GetCodeStyleTooltip(ECopyCodeStyle CopyStyle);
 	void FillSettingsMenu(FMenuBuilder& MenuBuilder);
+	void FillHelpMenu(FMenuBuilder& MenuBuilder);
 	TSharedRef<SWidget> MakeMainMenu();
 
 	FString TranslateDefaultStyleSets(FName StyleSet);
@@ -42,7 +43,7 @@ private:
 
 	TArray<TSharedPtr<FName>> AllStyles;
 
-	UEditorIconBrowserUserSettings* GetConfig();
+	USlateIconBrowserUserSettings* GetConfig();
 
 private:
 	TSharedPtr<SListView<TSharedPtr<FName>>> ListView;
@@ -50,4 +51,6 @@ private:
 	TSharedPtr<STextBlock> CopyNoteTextBlock;
 
 	TMap<FName,FString> DefaultStyleSetCode;
+
+	FText CustomStyleTooltipText = NSLOCTEXT("FSlateIconBrowserModule", "CustomStyleTooltipText", "Enter custom style. $1 will be replaced by the icon name.");
 };

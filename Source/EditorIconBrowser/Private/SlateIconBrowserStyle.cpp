@@ -1,6 +1,6 @@
 ﻿// Copyright sirjofri. Licensed under MIT license. See License.txt for full license text.
 
-#include "EditorIconBrowserStyle.h"
+#include "SlateIconBrowserStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Slate/SlateGameResources.h"
@@ -9,9 +9,9 @@
 
 #define RootToContentDir Style->RootToContentDir
 
-TSharedPtr<FSlateStyleSet> FEditorIconBrowserStyle::StyleInstance = nullptr;
+TSharedPtr<FSlateStyleSet> FSlateIconBrowserStyle::StyleInstance = nullptr;
 
-void FEditorIconBrowserStyle::Initialize()
+void FSlateIconBrowserStyle::Initialize()
 {
 	if (!StyleInstance.IsValid())
 	{
@@ -20,14 +20,14 @@ void FEditorIconBrowserStyle::Initialize()
 	}
 }
 
-void FEditorIconBrowserStyle::Shutdown()
+void FSlateIconBrowserStyle::Shutdown()
 {
 	FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
 	ensure(StyleInstance.IsUnique());
 	StyleInstance.Reset();
 }
 
-FName FEditorIconBrowserStyle::GetStyleSetName()
+FName FSlateIconBrowserStyle::GetStyleSetName()
 {
 	static FName StyleSetName(TEXT("EditorIconBrowserStyle"));
 	return StyleSetName;
@@ -36,7 +36,7 @@ FName FEditorIconBrowserStyle::GetStyleSetName()
 const FVector2D Icon16x16(16.0f, 16.0f);
 const FVector2D Icon20x20(20.0f, 20.0f);
 
-TSharedRef< FSlateStyleSet > FEditorIconBrowserStyle::Create()
+TSharedRef< FSlateStyleSet > FSlateIconBrowserStyle::Create()
 {
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("EditorIconBrowserStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("EditorIconBrowser")->GetBaseDir() / TEXT("Resources"));
@@ -46,7 +46,7 @@ TSharedRef< FSlateStyleSet > FEditorIconBrowserStyle::Create()
 	return Style;
 }
 
-void FEditorIconBrowserStyle::ReloadTextures()
+void FSlateIconBrowserStyle::ReloadTextures()
 {
 	if (FSlateApplication::IsInitialized())
 	{
@@ -54,7 +54,7 @@ void FEditorIconBrowserStyle::ReloadTextures()
 	}
 }
 
-const ISlateStyle& FEditorIconBrowserStyle::Get()
+const ISlateStyle& FSlateIconBrowserStyle::Get()
 {
 	return *StyleInstance;
 }
