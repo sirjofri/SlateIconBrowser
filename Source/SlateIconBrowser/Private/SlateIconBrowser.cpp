@@ -1,6 +1,8 @@
 ﻿// Copyright sirjofri. Licensed under MIT license. See License.txt for full license text.
 
 #include "SlateIconBrowser.h"
+
+#include "EditorStyleSet.h"
 #include "SlateIconBrowserStyle.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "LevelEditor.h"
@@ -271,7 +273,7 @@ void FSlateIconBrowserModule::FillHelpMenu(FMenuBuilder& MenuBuilder)
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("HelpDocumentation", "Documentation"),
 			LOCTEXT("HelpDocumentationTooltip", "Opens the documentation"),
-			FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Documentation"),
+			FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Documentation"),
 			FUIAction(
 				FExecuteAction::CreateLambda([=]
 				{
@@ -312,7 +314,7 @@ void FSlateIconBrowserModule::FillDefaultStyleSetCodes()
 {
 #define STYLECODE(A, B) DefaultStyleSetCode.Add(FName(A), TEXT(B));
 	
-	STYLECODE("EditorStyle", "FEditorStyle::GetStyleSetName()");
+	STYLECODE("EditorStyle", "FAppStyle::GetAppStyleSetName()");
 	STYLECODE("CoreStyle", "FAppStyle::GetAppStyleSetName()");
 	STYLECODE("UMGCoreStyle", "FUMGCoreStyle::Get().GetStyleSetName()");
 

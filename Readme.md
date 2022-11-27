@@ -32,11 +32,11 @@ Slate Icon Browser supports multiple code copying styles:
 
 The first two are quite obvious: They allow copying C++ code like the following:
 
-    FSlateIcon(FEditorStyle::GetStyleSetName(), "Icon")
+    FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icon")
     FSlateIcon(FName("SomeStyle"), "Icon")
     FSlateIconFinder::FindIcon("Icon")
 
-A few default styles will be replaced by the generic class call (like `FEditorStyle::GetStyleSetName()`) while others will be copied as a FName reference instead (using `FName("SomeStyleSet")`).
+A few default styles will be replaced by the generic class call (like `FAppStyle::GetAppStyleSetName()`) while others will be copied as a FName reference instead (using `FName("SomeStyleSet")`).
 
 _Custom Style_ is a little different: It allows you to specify a code fragment manually in a separate input field.
 In this input field, the string `$1` will be replaced by the code of the icon.
