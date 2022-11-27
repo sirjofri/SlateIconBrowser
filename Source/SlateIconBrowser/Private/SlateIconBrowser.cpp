@@ -499,7 +499,7 @@ void FSlateIconBrowserModule::InputTextChanged(const FText& Text)
 void FSlateIconBrowserModule::MakeValidConfiguration()
 {
 	if (GetConfig()->SelectedStyle.IsNone())
-		GetConfig()->SelectedStyle = FEditorStyle::GetStyleSetName();
+		GetConfig()->SelectedStyle = FAppStyle::GetAppStyleSetName();
 }
 
 #undef LOCTEXT_NAMESPACE
