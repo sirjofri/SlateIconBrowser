@@ -1,4 +1,4 @@
-﻿// Copyright sirjofri. Licensed under MIT license. See License.txt for full license text.
+﻿// Copyright 2022 sirjofri. Licensed under MIT license. See License.txt for full license text.
 
 using UnrealBuildTool;
 
