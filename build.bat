@@ -11,5 +11,7 @@ for /f "tokens=2* skip=2" %%a in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Eng
 call "%epic%\Engine\Build\BatchFiles\RunUAT.bat" BuildPlugin -Plugin="%CD%\SlateIconBrowser.uplugin" -Package="%temp%\SlateIconBrowser\%1" -Rocket
 rd /s /q %temp%\SlateIconBrowser\%1\Binaries
 rd /s /q %temp%\SlateIconBrowser\%1\Intermediate
+md %temp%\SlateIconBrowser\%1\Config
+copy Config\FilterPlugin.ini %temp%\SlateIconBrowser\%1\Config\FilterPlugin.ini
 tar -a -c -f SlateIconBrowser-%1.zip -C %temp%\SlateIconBrowser\%1\ *
 goto :eof
