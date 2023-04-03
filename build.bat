@@ -1,7 +1,7 @@
 setlocal
 
 md %temp%\SlateIconBrowser
-for %%a in (5.0 5.1) do call :build %%a
+for %%a in (5.0 5.1 5.2) do call :build %%a
 rd /s /q %temp%\SlateIconBrowser
 goto :eof
 
@@ -13,5 +13,6 @@ rd /s /q %temp%\SlateIconBrowser\%1\Binaries
 rd /s /q %temp%\SlateIconBrowser\%1\Intermediate
 md %temp%\SlateIconBrowser\%1\Config
 copy Config\FilterPlugin.ini %temp%\SlateIconBrowser\%1\Config\FilterPlugin.ini
+del SlateIconBrowser-%1.zip
 tar -a -c -f SlateIconBrowser-%1.zip -C %temp%\SlateIconBrowser\%1\ *
 goto :eof
