@@ -3,8 +3,11 @@
 #include "SlateIconBrowser.h"
 
 #include "EditorStyleSet.h"
+#include "Framework/Application/MenuStack.h"
+#include "Framework/Application/SlateApplication.h"
 #include "SlateIconBrowserStyle.h"
 #include "HAL/PlatformApplicationMisc.h"
+#include "Layout/WidgetPath.h"
 #include "LevelEditor.h"
 #include "UMGStyle.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -14,6 +17,8 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Styling/UMGCoreStyle.h"
+#include "Widgets/Input/SComboBox.h"
+#include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Layout/SExpandableArea.h"
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Notifications/SNotificationList.h"
@@ -123,7 +128,7 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 						return SNew(STextBlock).Text(FText::FromName(*InItem.Get()));
 					})
 					[
-						SNew(STextBlock).Text_Lambda([=]{ return FText::FromName(GetConfig()->SelectedStyle); })
+						SNew(STextBlock).Text_Lambda([this]{ return FText::FromName(GetConfig()->SelectedStyle); })
 					]
 				]
 				+SHorizontalBox::Slot()
@@ -149,7 +154,7 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 					.OnGenerateRow_Raw(this, &FSlateIconBrowserModule::GenerateRow)
 					.ListItemsSource(&Lines)
 					.SelectionMode(ESelectionMode::Single)
-					.Visibility_Lambda([=]
+					.Visibility_Lambda([this]
 					{
 						return Lines.IsEmpty() ? EVisibility::Collapsed : EVisibility::Visible;
 					})
@@ -159,7 +164,7 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 				[
 					SNew(SBox)
 					.HAlign(EHorizontalAlignment::HAlign_Center)
-					.Visibility_Lambda([=]
+					.Visibility_Lambda([this]
 					{
 						return Lines.IsEmpty() ? EVisibility::Visible : EVisibility::Collapsed;
 					})

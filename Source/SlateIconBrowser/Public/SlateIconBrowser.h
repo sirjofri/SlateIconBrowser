@@ -3,11 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Input/Reply.h"
 #include "SlateIconBrowserUserSettings.h"
 #include "Modules/ModuleManager.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;
+class ITableRow;
+class STableViewBase;
+class STextBlock;
+template<typename T> class SListView;
+template<typename T> class SComboBox;
 
 class FSlateIconBrowserModule : public IModuleInterface
 {
