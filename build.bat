@@ -1,7 +1,7 @@
 setlocal
 
 md %temp%\SlateIconBrowser
-for %%a in (5.0 5.1 5.2) do call :build %%a
+for %%a in (5.0 5.1 5.2 5.3) do call :build %%a
 rd /s /q %temp%\SlateIconBrowser
 goto :eof
 
