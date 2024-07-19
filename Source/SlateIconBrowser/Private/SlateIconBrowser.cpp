@@ -58,6 +58,10 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 	CacheAllLines();
 
 	return SNew(SDockTab)
+		.OnTabClosed_Lambda([](TSharedRef<SDockTab>)
+		{
+			GetMutableDefault<USlateIconBrowserUserSettings>()->FilterString = TEXT("");
+		})
 		.TabRole(ETabRole::NomadTab)
 		[
 			// Put your tab content here!
