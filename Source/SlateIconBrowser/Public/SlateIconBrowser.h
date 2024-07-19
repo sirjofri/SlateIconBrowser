@@ -15,6 +15,14 @@ class STextBlock;
 template<typename T> class SListView;
 template<typename T> class SComboBox;
 
+
+#if ENGINE_MAJOR_VERSION == 4
+#define EDITOR_STYLE_SAFE() FEditorStyle
+#else
+#define EDITOR_STYLE_SAFE() FAppStyle
+#endif
+
+
 class FSlateIconBrowserModule : public IModuleInterface
 {
 public:

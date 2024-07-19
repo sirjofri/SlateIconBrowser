@@ -36,7 +36,11 @@ public class SlateIconBrowser : ModuleRules
 			{
 				"Projects",
 				"InputCore",
+				
+#if UE_5_0_OR_LATER
 				"EditorFramework",
+#endif
+				
 				"UnrealEd",
 				"CoreUObject",
 				"Engine",

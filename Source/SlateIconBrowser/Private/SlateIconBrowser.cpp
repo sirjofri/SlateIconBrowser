@@ -16,7 +16,12 @@
 #include "WorkspaceMenuStructureModule.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Styling/SlateStyleRegistry.h"
+
+#if ENGINE_MAJOR_VERSION == 5
 #include "Styling/UMGCoreStyle.h"
+#endif
+
+#include "SlateIconBrowserHacker.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Layout/SExpandableArea.h"
@@ -156,7 +161,7 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 					.SelectionMode(ESelectionMode::Single)
 					.Visibility_Lambda([this]
 					{
-						return Lines.IsEmpty() ? EVisibility::Collapsed : EVisibility::Visible;
+						return Lines.Num() == 0 ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
 				+SVerticalBox::Slot()
@@ -166,7 +171,7 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 					.HAlign(EHorizontalAlignment::HAlign_Center)
 					.Visibility_Lambda([this]
 					{
-						return Lines.IsEmpty() ? EVisibility::Visible : EVisibility::Collapsed;
+						return Lines.Num() == 0 ? EVisibility::Visible : EVisibility::Collapsed;
 					})
 					[
 						SNew(STextBlock)
@@ -176,18 +181,32 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 			]
 			+SVerticalBox::Slot()
 			.VAlign(EVerticalAlignment::VAlign_Center)
+			.Padding(FMargin(0,4,0,0))
 			.AutoHeight()
 			[
 				SNew(SBorder)
-				.BorderImage(FAppStyle::Get().GetBrush("Brushes.Panel"))
+#if ENGINE_MAJOR_VERSION == 5
+				.BorderImage(EDITOR_STYLE_SAFE()::Get().GetBrush("Brushes.Panel"))
+#else
+				.BorderImage(EDITOR_STYLE_SAFE()::Get().GetBrush("ToolPanel.GroupBorder"))
+#endif
 				.Padding(FMargin(10, 5))
 				[
-					SAssignNew(CopyNoteTextBlock, STextBlock)
-					.Text_Lambda([&]
-					{
-						return FText::Format(LOCTEXT("CopyNote", "Double click a line to copy the {0} C++ code."),
-							GetCodeStyleText(GetConfig()->CopyCodeStyle));
-					})
+					SNew(SHorizontalBox)
+					+SHorizontalBox::Slot()
+					.AutoWidth()
+					[
+						SAssignNew(CopyNoteTextBlock, STextBlock)
+						.Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
+						.Text_Lambda([this]{ return GetCodeStyleText(GetConfig()->CopyCodeStyle); })
+					]
+					+SHorizontalBox::Slot()
+					.Padding(FMargin(4, 0))
+					.AutoWidth()
+					[
+						SNew(STextBlock)
+						.Text_Lambda([]{ return LOCTEXT("CopyNote", "Double click a line to copy"); })
+					]
 				]
 			]
 		];
@@ -278,7 +297,12 @@ void FSlateIconBrowserModule::FillHelpMenu(FMenuBuilder& MenuBuilder)
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("HelpDocumentation", "Documentation"),
 			LOCTEXT("HelpDocumentationTooltip", "Opens the documentation"),
+#if ENGINE_MAJOR_VERSION == 5
 			FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Documentation"),
+#else
+			FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Documentation"),
+#endif
+			
 			FUIAction(
 				FExecuteAction::CreateLambda([=]
 				{
@@ -318,12 +342,17 @@ FString FSlateIconBrowserModule::TranslateDefaultStyleSets(FName StyleSet)
 void FSlateIconBrowserModule::FillDefaultStyleSetCodes()
 {
 #define STYLECODE(A, B) DefaultStyleSetCode.Add(FName(A), TEXT(B));
-	
+
+#if ENGINE_MAJOR_VERSION == 5
 	STYLECODE("EditorStyle", "FAppStyle::GetAppStyleSetName()");
 	STYLECODE("CoreStyle", "FAppStyle::GetAppStyleSetName()");
 	STYLECODE("UMGCoreStyle", "FUMGCoreStyle::Get().GetStyleSetName()");
+#else
+	STYLECODE("EditorStyle", "FEditorStyle::GetStyleSetName()")
+	STYLECODE("CoreStyle", "FCoreStyle::Get().GetStyleSetName()")
+	STYLECODE("UMGStyle", "FUMGStyle::GetStyleSetName()")
+#endif
 
-	;
 #undef STYLECODE
 }
 
@@ -338,17 +367,30 @@ void FSlateIconBrowserModule::CacheAllStyleNames()
 			return true;
 		}
 	);
+
+	AllStyles.Sort([](const TSharedPtr<FName>& A, const TSharedPtr<FName>& B)
+	{
+		const FString AString = A->ToString();
+		const FString BString = B->ToString();
+		return AString.Compare(BString) < 0;
+	});
 }
 
 void FSlateIconBrowserModule::CacheAllLines()
 {
 	const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle);
-	check(Style);
-	TSet<FName> keys = Style->GetStyleKeys();
+	const FSlateStyleSet* StyleSet = static_cast<const FSlateStyleSet*>(Style);
+	if (!StyleSet) { ensureMsgf(false, TEXT("Unexpected nullptr")); }
 
+#if ENGINE_MAJOR_VERSION == 5
+	TSet<FName> keys = Style->GetStyleKeys();
+#else
+	TSet<FName> keys = HackerMisc::GetStyleKeys(StyleSet);
+#endif
+	
 	AllLines.Empty(keys.Num());
 	AllLines.Reserve(keys.Num());
-
+	
 	for (FName key : keys) {
 		const FSlateBrush* brush = Style->GetOptionalBrush(key);
 		if (!brush || brush == FStyleDefaults::GetNoBrush())
@@ -371,7 +413,11 @@ void FSlateIconBrowserModule::CopyIconCodeToClipboard(FName Name, ECopyCodeStyle
 
 	FNotificationInfo Info(LOCTEXT("CopiedNotification", "C++ code copied to clipboard"));
 	Info.ExpireDuration = 3.f;
+#if ENGINE_MAJOR_VERSION == 5
 	Info.SubText = FText::FromString(CopyText);
+#else
+	Info.Text = FText::FromString(CopyText);
+#endif
 	FSlateNotificationManager::Get().AddNotification(Info);
 }
 
@@ -473,7 +519,9 @@ TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FName> Nam
 			.Padding(FMargin(10, 5))
 			[
 				SNew(SImage)
+#if ENGINE_MAJOR_VERSION == 5
 				.DesiredSizeOverride(DesiredIconSize)
+#endif
 				.Image(Brush)
 			]
 		]
@@ -504,9 +552,17 @@ void FSlateIconBrowserModule::InputTextChanged(const FText& Text)
 void FSlateIconBrowserModule::MakeValidConfiguration()
 {
 	if (GetConfig()->SelectedStyle.IsNone())
+#if ENGINE_MAJOR_VERSION == 5
 		GetConfig()->SelectedStyle = FAppStyle::GetAppStyleSetName();
+#else
+		GetConfig()->SelectedStyle = FEditorStyle::GetStyleSetName();
+#endif
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
+#if ENGINE_MAJOR_VERSION == 5
 IMPLEMENT_MODULE(FSlateIconBrowserModule, EditorIconBrowser)
+#else
+IMPLEMENT_MODULE(FSlateIconBrowserModule, SlateIconBrowser)
+#endif
