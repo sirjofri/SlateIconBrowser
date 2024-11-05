@@ -159,7 +159,7 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 				+SVerticalBox::Slot()
 				.FillHeight(1.0)
 				[
-					SAssignNew(ListView, SListView<TSharedPtr<FName>>)
+					SAssignNew(ListView, SListView<TSharedPtr<FIconLine>>)
 					.OnGenerateRow_Raw(this, &FSlateIconBrowserModule::GenerateRow)
 					.ListItemsSource(&Lines)
 					.SelectionMode(ESelectionMode::Single)
@@ -206,10 +206,17 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 					]
 					+SHorizontalBox::Slot()
 					.Padding(FMargin(4, 0))
-					.AutoWidth()
+					.FillWidth(1.0)
 					[
 						SNew(STextBlock)
 						.Text_Lambda([]{ return LOCTEXT("CopyNote", "Double click a line to copy"); })
+					]
+					+SHorizontalBox::Slot()
+					.Padding(FMargin(4, 0))
+					.AutoWidth()
+					[
+						SNew(STextBlock)
+						.Text_Lambda([&]{ return FText::AsNumber(Lines.Num()); })
 					]
 				]
 			]
@@ -363,6 +370,8 @@ void FSlateIconBrowserModule::FillDefaultStyleSetCodes()
 void FSlateIconBrowserModule::CacheAllStyleNames()
 {
 	AllStyles.Empty(AllStyles.Num());
+
+	AllStyles.Add(MakeShareable(new FName(Name_AllStyles)));
 	
 	FSlateStyleRegistry::IterateAllStyles(
 		[&](const ISlateStyle& Style)
@@ -382,25 +391,43 @@ void FSlateIconBrowserModule::CacheAllStyleNames()
 
 void FSlateIconBrowserModule::CacheAllLines()
 {
-	const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle);
-	const FSlateStyleSet* StyleSet = static_cast<const FSlateStyleSet*>(Style);
-	if (!StyleSet) { ensureMsgf(false, TEXT("Unexpected nullptr")); }
+	auto CacheForStyle = [this](FName& StyleName)
+	{
+		const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(StyleName);
+		if (!Style) {
+			ensureMsgf(false, TEXT("Unexpected nullptr"));
+			return;
+		}
 
 #if ENGINE_MAJOR_VERSION == 5
-	TSet<FName> keys = Style->GetStyleKeys();
+		TSet<FName> keys = Style->GetStyleKeys();
 #else
-	TSet<FName> keys = HackerMisc::GetStyleKeys(StyleSet);
+		const FSlateStyleSet* StyleSet = static_cast<const FSlateStyleSet*>(Style);
+		if (!StyleSet) { ensureMsgf(false, TEXT("Unexpected nullptr")); }
+		TSet<FName> keys = HackerMisc::GetStyleKeys(StyleSet);
 #endif
 	
-	AllLines.Empty(keys.Num());
-	AllLines.Reserve(keys.Num());
+		AllLines.Reserve(AllLines.Num() + keys.Num());
 	
-	for (FName key : keys) {
-		const FSlateBrush* brush = Style->GetOptionalBrush(key);
-		if (!brush || brush == FStyleDefaults::GetNoBrush())
-			continue;
-		AllLines.Add(key.ToString());
+		for (FName key : keys) {
+			const FSlateBrush* brush = Style->GetOptionalBrush(key);
+			if (!brush || brush == FStyleDefaults::GetNoBrush())
+				continue;
+			AllLines.Add(TTuple<FName,FString>(StyleName, key.ToString()));
+		}
+	};
+
+	AllLines.Empty(AllLines.Num());
+	if (GetConfig()->SelectedStyle == Name_AllStyles) {
+		for (TSharedPtr<FName> key : AllStyles) {
+			if (*key == Name_AllStyles)
+				continue;
+			CacheForStyle(*key);
+		}
+	} else {
+		CacheForStyle(GetConfig()->SelectedStyle);
 	}
+	
 	InputTextChanged(FText::FromString(GetConfig()->FilterString));
 }
 
@@ -491,10 +518,10 @@ FReply FSlateIconBrowserModule::EntryContextMenu(const FGeometry& Geometry, cons
 	return FReply::Handled();
 }
 
-TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FName> Name,
+TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FIconLine> IconLine,
                                                             const TSharedRef<STableViewBase>& TableViewBase)
 {
-	auto Brush = FSlateStyleRegistry::FindSlateStyle(GetConfig()->SelectedStyle)->GetOptionalBrush(*Name.Get());
+	auto Brush = FSlateStyleRegistry::FindSlateStyle(IconLine->Style)->GetOptionalBrush(IconLine->Name);
 	FVector2D DesiredIconSize = Brush->GetImageSize();
 	if (Brush->GetImageType() == ESlateBrushImageType::NoImage)
 		DesiredIconSize = FVector2D(20);
@@ -506,8 +533,8 @@ TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FName> Nam
 		{
 			CopyIconCodeToClipboard(N, GetConfig()->CopyCodeStyle);
 			return FReply::Handled();
-		}, *Name.Get())
-		.OnMouseButtonUp_Raw(this, &FSlateIconBrowserModule::EntryContextMenu, *Name.Get())
+		}, IconLine->Name)
+		.OnMouseButtonUp_Raw(this, &FSlateIconBrowserModule::EntryContextMenu, IconLine->Name)
 		[
 			SNew(SHorizontalBox)
 			+SHorizontalBox::Slot()
@@ -515,7 +542,7 @@ TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FName> Nam
 			.Padding(FMargin(10, 5))
 			[
 				SNew(STextBlock)
-				.Text(FText::FromName(*Name.Get()))
+				.Text(FText::FromName(IconLine->Name))
 			]
 			+SHorizontalBox::Slot()
 			.AutoWidth()
@@ -539,15 +566,15 @@ void FSlateIconBrowserModule::InputTextChanged(const FText& Text)
 	Lines.Empty(AllLines.Num());
 	
 	if (GetConfig()->FilterString.IsEmpty()) {
-		for (FString s : AllLines)
-			Lines.Add(MakeShareable(new FName(s)));
+		for (TTuple<FName,FString>& il : AllLines)
+			Lines.Add(MakeShareable(new FIconLine(il.Key, FName(il.Value))));
 		if (ListView.IsValid())
 			ListView.Get()->RequestListRefresh();
 		return;
 	}
-	for (FString s : AllLines) {
-		if (s.Contains(GetConfig()->FilterString))
-			Lines.Add(MakeShareable(new FName(s)));
+	for (TTuple<FName,FString>& il : AllLines) {
+		if (il.Value.Contains(GetConfig()->FilterString))
+			Lines.Add(MakeShareable(new FIconLine(il.Key, FName(il.Value))));
 		if (ListView.IsValid())
 			ListView.Get()->RequestListRefresh();
 	}
