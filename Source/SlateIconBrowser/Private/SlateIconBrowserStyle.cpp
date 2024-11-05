@@ -5,9 +5,15 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Slate/SlateGameResources.h"
 #include "Interfaces/IPluginManager.h"
-#include "Styling/SlateStyleMacros.h"
 
+#if ENGINE_MAJOR_VERSION == 5
+#include "Styling/SlateStyleMacros.h"
 #define RootToContentDir Style->RootToContentDir
+#else
+#define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( Style->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
+#endif
+
+
 
 TSharedPtr<FSlateStyleSet> FSlateIconBrowserStyle::StyleInstance = nullptr;
 
@@ -41,8 +47,11 @@ TSharedRef< FSlateStyleSet > FSlateIconBrowserStyle::Create()
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("SlateIconBrowserStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("SlateIconBrowser")->GetBaseDir() / TEXT("Resources"));
 
+#if ENGINE_MAJOR_VERSION == 5
 	Style->Set("SlateIconBrowser.Icon", new IMAGE_BRUSH_SVG(TEXT("Icon"), Icon20x20));
-
+#else
+	Style->Set("SlateIconBrowser.Icon", new IMAGE_BRUSH(TEXT("Icon128"), Icon20x20));
+#endif
 	return Style;
 }
 
