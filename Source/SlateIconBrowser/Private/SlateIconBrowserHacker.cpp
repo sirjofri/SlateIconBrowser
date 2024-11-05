@@ -1,5 +1,6 @@
 #include "SlateIconBrowserHacker.h"
 
+#if ENGINE_MAJOR_VERSION == 4
 
 TSet<FName> HackerMisc::
 GetStyleKeys(const FSlateStyleSet* Style)
@@ -62,3 +63,5 @@ GetStyleKeys(const FSlateStyleSet* Style)
 
 	return AllKeys;
 }
+
+#endif

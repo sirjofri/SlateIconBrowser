@@ -565,8 +565,4 @@ void FSlateIconBrowserModule::MakeValidConfiguration()
 
 #undef LOCTEXT_NAMESPACE
 
-#if ENGINE_MAJOR_VERSION == 5
-IMPLEMENT_MODULE(FSlateIconBrowserModule, EditorIconBrowser)
-#else
 IMPLEMENT_MODULE(FSlateIconBrowserModule, SlateIconBrowser)
-#endif

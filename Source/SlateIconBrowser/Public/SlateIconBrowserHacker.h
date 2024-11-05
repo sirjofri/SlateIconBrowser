@@ -1,5 +1,6 @@
 #pragma once
 
+#if ENGINE_MAJOR_VERSION == 4
 #include "Styling/SlateStyle.h"
 
 
@@ -51,3 +52,4 @@ namespace HackerMisc
 }
 
 #undef DECLARE_THIEF_FUNCTION
+#endif

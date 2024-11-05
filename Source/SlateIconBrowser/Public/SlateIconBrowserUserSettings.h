@@ -20,8 +20,6 @@ class USlateIconBrowserUserSettings : public UObject
 	GENERATED_BODY()
 	
 public:
-	// I think there is no need to make filter string serialized by config
-	// This makes it cumbersome if I open IconBrowser next time but I just want to search another Brush
 	UPROPERTY()
 	FString FilterString;
 
