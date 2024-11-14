@@ -509,4 +509,4 @@ void FSlateIconBrowserModule::MakeValidConfiguration()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FSlateIconBrowserModule, EditorIconBrowser)
+IMPLEMENT_MODULE(FSlateIconBrowserModule, SlateIconBrowser)
