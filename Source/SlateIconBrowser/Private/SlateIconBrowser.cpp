@@ -545,7 +545,7 @@ TSharedRef<ITableRow> FSlateIconBrowserModule::GenerateRow(TSharedPtr<FIconLine>
 			[
 				SNew(STextBlock)
 				.Text(FText::FromName(IconLine->Style))
-				.TextStyle(&FCoreStyle::Get().GetWidgetStyle<FTextBlockStyle>(TEXT("NormalText.Subdued")))
+				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>(TEXT("NormalText.Subdued")))
 			]
 			+SHorizontalBox::Slot()
 			.VAlign(EVerticalAlignment::VAlign_Center)
