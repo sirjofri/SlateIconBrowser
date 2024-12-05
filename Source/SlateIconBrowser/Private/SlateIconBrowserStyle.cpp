@@ -35,7 +35,7 @@ void FSlateIconBrowserStyle::Shutdown()
 
 FName FSlateIconBrowserStyle::GetStyleSetName()
 {
-	static FName StyleSetName(TEXT("SlateIconBrowserStyle"));
+	static FName StyleSetName(TEXT("SlateStyleBrowserStyle"));
 	return StyleSetName;
 }
 
@@ -44,13 +44,13 @@ const FVector2D Icon20x20(20.0f, 20.0f);
 
 TSharedRef< FSlateStyleSet > FSlateIconBrowserStyle::Create()
 {
-	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("SlateIconBrowserStyle"));
+	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("SlateStyleBrowserStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("SlateIconBrowser")->GetBaseDir() / TEXT("Resources"));
 
 #if ENGINE_MAJOR_VERSION == 5
-	Style->Set("SlateIconBrowser.Icon", new IMAGE_BRUSH_SVG(TEXT("Icon"), Icon20x20));
+	Style->Set("SlateStyleBrowser.Icon", new IMAGE_BRUSH_SVG(TEXT("Icon"), Icon20x20));
 #else
-	Style->Set("SlateIconBrowser.Icon", new IMAGE_BRUSH(TEXT("Icon128"), Icon20x20));
+	Style->Set("SlateStyleBrowser.Icon", new IMAGE_BRUSH(TEXT("Icon128"), Icon20x20));
 #endif
 	return Style;
 }
