@@ -15,6 +15,20 @@ class STextBlock;
 template<typename T> class SListView;
 template<typename T> class SComboBox;
 
+
+#if ENGINE_MAJOR_VERSION == 4
+#define EDITOR_STYLE_SAFE() FEditorStyle
+#else
+#define EDITOR_STYLE_SAFE() FAppStyle
+#endif
+
+struct FIconLine
+{
+	FName Style;
+	FName Name;
+};
+
+
 class FSlateIconBrowserModule : public IModuleInterface
 {
 public:
@@ -24,10 +38,10 @@ public:
 	virtual void ShutdownModule() override;
 	
 private:
-	void CopyIconCodeToClipboard(FName Name, ECopyCodeStyle CodeStyle);
-	FString GenerateCopyCode(FName Name, ECopyCodeStyle CodeStyle);
-	FReply EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FName Name);
-	TSharedRef<ITableRow> GenerateRow(TSharedPtr<FName> Name, const TSharedRef<STableViewBase>& TableViewBase);
+	void CopyIconCodeToClipboard(TSharedPtr<FIconLine> IconLine, ECopyCodeStyle CodeStyle);
+	FString GenerateCopyCode(TSharedPtr<FIconLine> IconLine, ECopyCodeStyle CodeStyle);
+	FReply EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, TSharedPtr<FIconLine> IconLine);
+	TSharedRef<ITableRow> GenerateRow(TSharedPtr<FIconLine> IconLine, const TSharedRef<STableViewBase>& TableViewBase);
 	void InputTextChanged(const FText& Text);
 	void MakeValidConfiguration();
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
@@ -45,19 +59,20 @@ private:
 	void CacheAllStyleNames();
 	void CacheAllLines();
 
-	TArray<TSharedPtr<FName>> Lines;
-	TArray<FString> AllLines;
+	TArray<TSharedPtr<FIconLine>> Lines;
+	TArray<TTuple<FName,FString>> AllLines;
 
 	TArray<TSharedPtr<FName>> AllStyles;
 
 	USlateIconBrowserUserSettings* GetConfig();
 
 private:
-	TSharedPtr<SListView<TSharedPtr<FName>>> ListView;
+	TSharedPtr<SListView<TSharedPtr<FIconLine>>> ListView;
 	TSharedPtr<SComboBox<TSharedPtr<FName>>> StyleSelectionComboBox;
 	TSharedPtr<STextBlock> CopyNoteTextBlock;
 
 	TMap<FName,FString> DefaultStyleSetCode;
 
-	FText CustomStyleTooltipText = NSLOCTEXT("FSlateIconBrowserModule", "CustomStyleTooltipText", "Enter custom style. $1 will be replaced by the icon name.");
+	FName Name_AllStyles = FName("(All Styles)");
+	FText CustomStyleTooltipText = NSLOCTEXT("FSlateIconBrowserModule", "CustomStyleTooltipText", "Enter custom style. $1 will be replaced with the icon name, $2 with the style name.");
 };

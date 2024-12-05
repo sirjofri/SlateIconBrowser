@@ -20,7 +20,7 @@ class USlateIconBrowserUserSettings : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(Config)
+	UPROPERTY()
 	FString FilterString;
 
 	UPROPERTY(Config)
