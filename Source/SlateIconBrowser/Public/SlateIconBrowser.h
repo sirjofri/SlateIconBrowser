@@ -26,6 +26,9 @@ struct FIconLine
 {
 	FName Style;
 	FName Name;
+	
+	FIconLine() = default;
+	FIconLine(FName InStyle, FName InName) : Style(InStyle), Name(InName) {};
 };
 
 
