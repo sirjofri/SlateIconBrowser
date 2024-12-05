@@ -1,6 +1,7 @@
 #pragma once
 #include "SlateIconBrowserUserSettings.h"
 
+class STypeFilterWidget;
 class ISlateStyleData;
 class USlateIconBrowserUserSettings;
 
@@ -26,6 +27,8 @@ private:
 	void FillDefaultStyleSetCodes();
 	void SelectCodeStyle(ECopyCodeStyle CopyCodeStyle);
 	void InputTextChanged(const FText& Text);
+
+	void UpdateList();
 	
 	FText GetCodeStyleText(ECopyCodeStyle CopyStyle);
 	
@@ -40,10 +43,13 @@ private:
 private:
 	TArray<TSharedPtr<ISlateStyleData>> Lines;
 	TArray<TSharedPtr<FName>> AllStyles;
+	
+	TArray<FName> FilterTypes;
 
 private:
 	TSharedPtr<SListView<TSharedPtr<ISlateStyleData>>> ListView;
 	TSharedPtr<SComboBox<TSharedPtr<FName>>> StyleSelectionComboBox;
+	TSharedPtr<STypeFilterWidget> TypeFilterWidget;
 	TSharedPtr<STextBlock> CopyNoteTextBlock;
 
 	TMap<FName,FString> DefaultStyleSetCode;

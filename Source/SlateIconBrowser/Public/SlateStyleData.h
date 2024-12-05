@@ -10,16 +10,19 @@ public:
 	
 	virtual ~ISlateStyleData() = default;
 
-	virtual void Initialize(FName InStyle, FName InPropertyName)
+	virtual void Initialize(FName InStyle, FName InPropertyName, FName InType)
 	{
 		StyleName = InStyle;
 		PropertyName = InPropertyName;
+		Type = InType;
 	};
 	
 	virtual FName GetStyleName() { return StyleName;};
 	virtual FName GetPropertyName() { return PropertyName; };
+	virtual FName GetType() { return Type; };
 
 protected:
 	FName StyleName;
 	FName PropertyName;
+	FName Type;
 };
