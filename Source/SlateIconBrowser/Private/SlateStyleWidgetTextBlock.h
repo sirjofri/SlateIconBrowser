@@ -1,7 +1,7 @@
 #pragma once
 #include "SlateStyleData.h"
 
-class FSlateStyleWidgetTextBlock : public ISlateStyleData
+class FSlateStyleWidgetTextBlock : public FSlateStyleData
 {
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override;

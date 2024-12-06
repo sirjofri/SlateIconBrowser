@@ -15,3 +15,8 @@ TSharedRef<SWidget> FSlateStyleBrush::GenerateRowWidget()
 #endif
 		.Image(Brush);
 }
+
+void FSlateStyleBrush::FillRowContextMenu(FMenuBuilder& MenuBuilder)
+{
+	FSlateStyleData::FillRowContextMenu(MenuBuilder);
+}

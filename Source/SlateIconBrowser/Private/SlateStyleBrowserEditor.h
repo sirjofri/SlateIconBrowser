@@ -1,8 +1,8 @@
 #pragma once
-#include "SlateIconBrowserUserSettings.h"
+#include "SlateStyleBrowserUserSettings.h"
 
 class STypeFilterWidget;
-class ISlateStyleData;
+class FSlateStyleData;
 class USlateIconBrowserUserSettings;
 
 class SSlateStyleBrowserEditor : public SCompoundWidget
@@ -11,49 +11,44 @@ public:
 	SLATE_BEGIN_ARGS(SSlateStyleBrowserEditor) {}
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs);
+	void Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& MajorTab);
 
 private:
-	TSharedRef<SWidget> MakeMainMenu();
-	void FillSettingsMenu(FMenuBuilder& MenuBuilder);
-	void FillHelpMenu(FMenuBuilder& MenuBuilder);
-	
-	FText GetCodeStyleTooltip(ECopyCodeStyle CopyCodeStyle);
+	void FillEditMenu(FMenuBuilder& MenuBuilder);
+	static void FillHelpMenu(FMenuBuilder& MenuBuilder);
+	void BuildTabMenu(FMenuBarBuilder& MenuBarBuilder);
 
-	TSharedRef<ITableRow> GenerateRow(TSharedPtr<ISlateStyleData> SlateStyleData, const TSharedRef<STableViewBase>& TableViewBase);
-	FReply EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, TSharedPtr<ISlateStyleData> SlateStyleData);
+	TSharedRef<ITableRow> GenerateRow(TSharedPtr<FSlateStyleData> SlateStyleData, const TSharedRef<STableViewBase>& TableViewBase);
+	FReply EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, TSharedPtr<FSlateStyleData> SlateStyleData);
 	
 	void CacheAllStyleNames();
-	void FillDefaultStyleSetCodes();
-	void SelectCodeStyle(ECopyCodeStyle CopyCodeStyle);
+	void SelectCodeStyle(EDefaultCopyStyle CopyCodeStyle);
 	void InputTextChanged(const FText& Text);
 
 	void UpdateList();
 	
-	FText GetCodeStyleText(ECopyCodeStyle CopyStyle);
-	
-	TSharedPtr<ISlateStyleData> MakeSlateStyleData(const ISlateStyle* SlateStyle, FName Style, FName PropertyName);
+	TSharedPtr<FSlateStyleData> MakeSlateStyleData(const ISlateStyle* SlateStyle, FName Style, FName PropertyName);
 
-	USlateIconBrowserUserSettings* GetConfig();
+	USlateStyleBrowserUserSettings* GetConfig();
 	void MakeValidConfiguration();
-	FString TranslateDefaultStyleSets(FName StyleSet);
-	FString GenerateCopyCode(TSharedPtr<ISlateStyleData> SlateStyleData, ECopyCodeStyle CodeStyle);
-	void CopyIconCodeToClipboard(TSharedPtr<ISlateStyleData> SlateStyleData, ECopyCodeStyle CodeStyle);
 
 private:
-	TArray<TSharedPtr<ISlateStyleData>> Lines;
+	TArray<TSharedPtr<FSlateStyleData>> Lines;
 	TArray<TSharedPtr<FName>> AllStyles;
 	
 	TArray<FName> FilterTypes;
 
+	FString FilterString;
+	EDefaultCopyStyle DefaultCopyStyle = DCS_FirstEntry;
+
 private:
-	TSharedPtr<SListView<TSharedPtr<ISlateStyleData>>> ListView;
+	TSharedPtr<FTabManager> TabManager;
+	TSharedPtr<SListView<TSharedPtr<FSlateStyleData>>> ListView;
 	TSharedPtr<SComboBox<TSharedPtr<FName>>> StyleSelectionComboBox;
 	TSharedPtr<STypeFilterWidget> TypeFilterWidget;
-	TSharedPtr<STextBlock> CopyNoteTextBlock;
 
 	TMap<FName,FString> DefaultStyleSetCode;
 
 	FName Name_AllStyles = FName("(All Styles)");
-	FText CustomStyleTooltipText = NSLOCTEXT("SlateStyleBrowser", "CustomStyleTooltipText", "Enter custom style. $1 will be replaced with the icon name, $2 with the style name.");
+	FText QuickStyleTooltipText = NSLOCTEXT("SlateStyleBrowser", "CustomStyleTooltipText", "Enter custom style. $1 will be replaced with the icon name, $2 with the style name.");
 };

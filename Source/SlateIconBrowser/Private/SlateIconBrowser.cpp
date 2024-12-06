@@ -5,18 +5,11 @@
 #include "Framework/Application/MenuStack.h"
 #include "Framework/Application/SlateApplication.h"
 #include "SlateIconBrowserStyle.h"
-#include "HAL/PlatformApplicationMisc.h"
 #include "Layout/WidgetPath.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Text/STextBlock.h"
 #include "WorkspaceMenuStructure.h"
 #include "WorkspaceMenuStructureModule.h"
-#include "Framework/Notifications/NotificationManager.h"
-#include "Styling/SlateStyleRegistry.h"
-
-#if ENGINE_MAJOR_VERSION == 5
-#include "Styling/UMGCoreStyle.h"
-#endif
 
 #include "SlateStyleBrowserEditor.h"
 
@@ -44,12 +37,9 @@ void FSlateIconBrowserModule::ShutdownModule()
 
 TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
-	return SNew(SDockTab)
-		.TabRole(ETabRole::NomadTab)
-		[
-			// Put your tab content here!
-			SNew(SSlateStyleBrowserEditor)
-		];
+	const TSharedRef<SDockTab> DockTab = SNew(SDockTab).TabRole(ETabRole::MajorTab);
+	DockTab->SetContent(SNew(SSlateStyleBrowserEditor, DockTab));
+	return DockTab;
 }
 
 #undef LOCTEXT_NAMESPACE
