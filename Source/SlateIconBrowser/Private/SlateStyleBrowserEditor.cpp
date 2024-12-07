@@ -294,6 +294,14 @@ TSharedRef<ITableRow> SSlateStyleBrowserEditor::GenerateRow(TSharedPtr<FSlateSty
 				.Text(FText::FromName(SlateStyleData->GetPropertyName()))
 			]
 			+SHorizontalBox::Slot()
+			.VAlign(EVerticalAlignment::VAlign_Center)
+			.Padding(10., 5.)
+			[
+				SNew(STextBlock)
+				.Text(FText::FromName(SlateStyleData->GetType()))
+				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>(TEXT("NormalText.Subdued")))
+			]
+			+SHorizontalBox::Slot()
 			.FillWidth(1)
 			.VAlign(EVerticalAlignment::VAlign_Center)
 			.Padding(FMargin(10, 5))

@@ -1,5 +1,6 @@
 #include "DefaultSlateStyleDataProvider.h"
 
+#include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetTextBlock.h"
 
 
@@ -10,11 +11,12 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 	if (WidgetType == Tname && SlateStyle->HasWidgetStyle<StyleType>(PropertyName)) { \
 		const StyleType& ws = SlateStyle->GetWidgetStyle<StyleType>(PropertyName); \
 		TSharedPtr<FSlateStyleData> StyleData = MakeShared<ItemType>(); \
-		StyleData->Initialize(SlateStyle->GetStyleSetName(), PropertyName, ItemType::TypeName, ws.GetTypeName()); \
+		StyleData->Initialize(SlateStyle->GetStyleSetName(), PropertyName, Tname, ws.GetTypeName()); \
 		return StyleData; \
 	}
 
 	WIDGET(T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
+	WIDGET(T_Button, FButtonStyle, FSlateStyleWidgetButton);
 	
 #undef WIDGET
 	return nullptr;
@@ -24,5 +26,6 @@ TArray<FName> FDefaultSlateStyleDataProvider::GetSupportedWidgetTypes()
 {
 	return {
 		T_TextBlock,
+		T_Button,
 	};
 }
