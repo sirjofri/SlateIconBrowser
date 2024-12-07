@@ -5,6 +5,7 @@
 #include "SlateStyleData.h"
 #include "SlateStyleDataManager.h"
 #include "Styling/SlateStyleRegistry.h"
+#include "Widgets/SlateStyleTableRow.h"
 #include "Widgets/TypeFilterWidget.h"
 
 #if ENGINE_MAJOR_VERSION == 4
@@ -121,9 +122,41 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 			.FillHeight(1.0)
 			[
 				SAssignNew(ListView, SListView<TSharedPtr<FSlateStyleData>>)
+				.SelectionMode(ESelectionMode::Single)
 				.OnGenerateRow_Raw(this, &SSlateStyleBrowserEditor::GenerateRow)
+				.OnContextMenuOpening_Raw(this, &SSlateStyleBrowserEditor::EntryContextMenu)
+				.OnMouseButtonDoubleClick_Lambda([&](TSharedPtr<FSlateStyleData> data)
+				{
+					data->CopyDefault(DefaultCopyStyle, GetConfig()->QuickStyle);
+				})
 				.ListItemsSource(&Lines)
 				.SelectionMode(ESelectionMode::Single)
+				.HeaderRow(SNew(SHeaderRow)
+					+SHeaderRow::Column("StyleSetName")
+					.HAlignCell(HAlign_Left)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("HeaderRowStyleSetName", "Style Set"))
+					]
+					+SHeaderRow::Column("PropertyName")
+					.HAlignCell(HAlign_Left)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("HeaderRowPropertyName", "Property Name"))
+					]
+					+SHeaderRow::Column("WidgetType")
+					.HAlignCell(HAlign_Left)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("HeaderRowWidgetType", "Widget Type"))
+					]
+					+SHeaderRow::Column("Widget")
+					.HAlignCell(HAlign_Right)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("HeaderRowWidget", "Visualization"))
+					]
+				)
 				.Visibility_Lambda([this]
 				{
 					return Lines.Num() == 0 ? EVisibility::Collapsed : EVisibility::Visible;
@@ -267,80 +300,18 @@ void SSlateStyleBrowserEditor::BuildTabMenu(FMenuBarBuilder& MenuBarBuilder)
 TSharedRef<ITableRow> SSlateStyleBrowserEditor::GenerateRow(TSharedPtr<FSlateStyleData> SlateStyleData,
                                                             const TSharedRef<STableViewBase>& TableViewBase)
 {
-	return SNew(SComboRow<TSharedRef<FSlateStyleData>>, TableViewBase)
-	[
-		SNew(SBorder)
-		.OnMouseDoubleClick_Lambda([&](const FGeometry& Geometry, const FPointerEvent& PointerEvent, TSharedPtr<FSlateStyleData> data)
-		{
-			data->CopyDefault(DefaultCopyStyle, GetConfig()->QuickStyle);
-			return FReply::Handled();
-		}, SlateStyleData)
-		.OnMouseButtonUp_Raw(this, &SSlateStyleBrowserEditor::EntryContextMenu, SlateStyleData)
-		[
-			SNew(SHorizontalBox)
-			+SHorizontalBox::Slot()
-			.VAlign(EVerticalAlignment::VAlign_Center)
-			.Padding(FMargin(10, 5))
-			[
-				SNew(STextBlock)
-				.Text(FText::FromName(SlateStyleData->GetStyleName()))
-				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>(TEXT("NormalText.Subdued")))
-			]
-			+SHorizontalBox::Slot()
-			.VAlign(EVerticalAlignment::VAlign_Center)
-			.Padding(FMargin(10, 5))
-			[
-				SNew(STextBlock)
-				.Text(FText::FromName(SlateStyleData->GetPropertyName()))
-			]
-			+SHorizontalBox::Slot()
-			.VAlign(EVerticalAlignment::VAlign_Center)
-			.Padding(10., 5.)
-			[
-				SNew(STextBlock)
-				.Text(FText::FromName(SlateStyleData->GetType()))
-				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>(TEXT("NormalText.Subdued")))
-			]
-			+SHorizontalBox::Slot()
-			.FillWidth(1)
-			.VAlign(EVerticalAlignment::VAlign_Center)
-			.Padding(FMargin(10, 5))
-			[
-				SNew(SHorizontalBox)
-				+SHorizontalBox::Slot()
-				.FillWidth(1.)
-				[
-					SNew(SSpacer)
-				]
-				+SHorizontalBox::Slot()
-				.VAlign(VAlign_Center)
-				.AutoWidth()
-				[
-					SlateStyleData->GenerateRowWidget()
-				]
-			]
-		]
-	];
+	return SNew(SSlateStyleTableRow, TableViewBase)
+		.StyleData(SlateStyleData);
 }
 
-FReply SSlateStyleBrowserEditor::EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent,
-	TSharedPtr<FSlateStyleData> SlateStyleData)
+TSharedPtr<SWidget> SSlateStyleBrowserEditor::EntryContextMenu()
 {
-	if (PointerEvent.GetEffectingButton() != EKeys::RightMouseButton)
-		return FReply::Unhandled();
-
-	if (PointerEvent.GetEventPath() == nullptr)
-		return FReply::Unhandled();
-
 	FMenuBuilder MenuBuilder(true, nullptr);
-	SlateStyleData->FillRowContextMenu(MenuBuilder);
-
-	TSharedPtr<SWidget> MenuWidget = MenuBuilder.MakeWidget();
-	FWidgetPath WidgetPath = *PointerEvent.GetEventPath();
-	const FVector2D& Location = PointerEvent.GetScreenSpacePosition();
-	FSlateApplication::Get().PushMenu(WidgetPath.Widgets.Last().Widget, WidgetPath, MenuWidget.ToSharedRef(), Location, FPopupTransitionEffect(FPopupTransitionEffect::ContextMenu));
-			
-	return FReply::Handled();
+	TArray<TSharedPtr<FSlateStyleData>> Items = ListView->GetSelectedItems();
+	if (Items.Num() != 1)
+		return SNullWidget::NullWidget;
+	Items[0]->FillRowContextMenu(MenuBuilder);
+	return MenuBuilder.MakeWidget();
 }
 
 void SSlateStyleBrowserEditor::CacheAllStyleNames()

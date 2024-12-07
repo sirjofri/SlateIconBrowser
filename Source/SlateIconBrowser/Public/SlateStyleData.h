@@ -2,7 +2,11 @@
 
 #pragma once
 
-enum EDefaultCopyStyle : int;
+enum EDefaultCopyStyle
+{
+	DCS_FirstEntry,
+	DCS_QuickStyle,
+};
 
 class FSlateStyleData
 {

@@ -7,12 +7,6 @@
 #include "SlateStyleBrowserUserSettings.generated.h"
 
 
-enum EDefaultCopyStyle
-{
-	DCS_FirstEntry,
-	DCS_QuickStyle,
-};
-
 USTRUCT()
 struct FCopyStyleBundle
 {

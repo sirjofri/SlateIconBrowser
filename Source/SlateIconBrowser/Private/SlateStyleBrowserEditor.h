@@ -1,9 +1,9 @@
 #pragma once
 #include "SlateStyleBrowserUserSettings.h"
+#include "SlateStyleData.h"
 
 class ISlateStyleDataManager;
 class STypeFilterWidget;
-class FSlateStyleData;
 class USlateIconBrowserUserSettings;
 
 class SSlateStyleBrowserEditor : public SCompoundWidget
@@ -20,7 +20,7 @@ private:
 	void BuildTabMenu(FMenuBarBuilder& MenuBarBuilder);
 
 	TSharedRef<ITableRow> GenerateRow(TSharedPtr<FSlateStyleData> SlateStyleData, const TSharedRef<STableViewBase>& TableViewBase);
-	FReply EntryContextMenu(const FGeometry& Geometry, const FPointerEvent& PointerEvent, TSharedPtr<FSlateStyleData> SlateStyleData);
+	TSharedPtr<SWidget> EntryContextMenu();
 	
 	void CacheAllStyleNames();
 	void SelectCodeStyle(EDefaultCopyStyle CopyCodeStyle);
