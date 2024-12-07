@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SlateStyleDataManager.h"
 #include "Input/Reply.h"
 #include "Modules/ModuleManager.h"
 
+
+class FSlateStyleDataManager;
 
 class FSlateIconBrowserModule : public IModuleInterface
 {
@@ -15,6 +18,10 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
+	static TSharedPtr<ISlateStyleDataManager> GetSlateStyleDataManager();
+
 private:
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
+
+	TSharedPtr<FSlateStyleDataManager> SlateStyleDataManager;
 };

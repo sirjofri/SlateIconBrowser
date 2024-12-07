@@ -1,9 +1,9 @@
 #include "SlateStyleBrowserEditor.h"
 
 #include "SlateStyleBrowserUserSettings.h"
-#include "SlateStyleBrush.h"
+#include "DefaultWidgetTypes/SlateStyleBrush.h"
 #include "SlateStyleData.h"
-#include "SlateStyleWidgetTextBlock.h"
+#include "SlateStyleDataManager.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Widgets/TypeFilterWidget.h"
 
@@ -15,8 +15,10 @@
 
 #define LOCTEXT_NAMESPACE "SlateStyleBrowser"
 
-void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& MajorTab)
+void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& MajorTab, TWeakPtr<ISlateStyleDataManager> InSlateStyleDataManager)
 {
+	SlateStyleDataManager = InSlateStyleDataManager;
+	
 	MakeValidConfiguration();
 	CacheAllStyleNames();
 	InputTextChanged(FText::GetEmpty());
@@ -95,10 +97,6 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 				.SelectPrompt(LOCTEXT("SelectTypeFilterPrompt", "Select Types"))
 				.OnSelectionChanged_Lambda([&](const TArray<FName>& SelectedOptions)
 				{
-					UE_LOG(LogTemp, Display, TEXT("Selected Options: %d"), SelectedOptions.Num());
-					for (auto n : SelectedOptions) {
-						UE_LOG(LogTemp, Display, TEXT("Selected: %s"), *n.ToString());
-					}
 					FilterTypes = SelectedOptions;
 					UpdateList();
 				})
@@ -178,13 +176,17 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 		]
 	];
 
-	// TODO: Supported types. Optimize/Refactor
-	TArray<FName> Options;
-	Options.Add(FSlateStyleBrush::TypeName);
-	Options.Add(FSlateStyleWidgetTextBlock::TypeName);
+	TArray<FName> TypeOptions;
+	TypeOptions.Add(TEXT("Brush"));
+	TSharedPtr<ISlateStyleDataManager> DataMgr = SlateStyleDataManager.Pin();
+	if (DataMgr.IsValid()) {
+		TArray<FName> WidgetTypes;
+		DataMgr->GetRegisteredTypes(WidgetTypes);
+		TypeOptions.Append(WidgetTypes);
+	}
 	
 	if (TypeFilterWidget.IsValid()) {
-		TypeFilterWidget->SetOptions(Options);
+		TypeFilterWidget->SetOptions(TypeOptions);
 		TypeFilterWidget->SelectAll();
 	}
 }
@@ -423,22 +425,22 @@ TSharedPtr<FSlateStyleData> SSlateStyleBrowserEditor::MakeSlateStyleData(const I
                                                                          FName PropertyName)
 {
 	TSharedPtr<FSlateStyleData> StyleData;
+	TSharedPtr<ISlateStyleDataManager> DataMgr = SlateStyleDataManager.Pin();
+	if (!DataMgr.IsValid())
+		return nullptr;
+
+	TArray<FName> WidgetTypes;
+	DataMgr->GetRegisteredTypes(WidgetTypes);
+
+	for (FName WidgetType : WidgetTypes) {
+		StyleData = DataMgr->MakeSlateStyleData(SlateStyle, PropertyName, WidgetType);
+		if (StyleData.IsValid())
+			return StyleData;
+	}
 
 	/*
 	 * Important: Get brushes last, so that DefaultBrushes don't interfere!
 	 */
-	
-#define WIDGET(StyleType, ItemType) \
-	if (SlateStyle->HasWidgetStyle<StyleType>(PropertyName)) { \
-		const StyleType& ws = SlateStyle->GetWidgetStyle<StyleType>(PropertyName); \
-		StyleData = MakeShared<ItemType>(); \
-		StyleData->Initialize(Style, PropertyName, ItemType::TypeName, ws.GetTypeName()); \
-		return StyleData; \
-	}
-
-	WIDGET(FTextBlockStyle, FSlateStyleWidgetTextBlock);
-
-#undef WIDGET
 	
 	const FSlateBrush* Brush = SlateStyle->GetBrush(PropertyName);
 	// This is not ideal! Default brushes won't appear at all this way.

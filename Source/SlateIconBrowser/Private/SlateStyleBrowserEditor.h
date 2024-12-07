@@ -1,6 +1,7 @@
 #pragma once
 #include "SlateStyleBrowserUserSettings.h"
 
+class ISlateStyleDataManager;
 class STypeFilterWidget;
 class FSlateStyleData;
 class USlateIconBrowserUserSettings;
@@ -11,7 +12,7 @@ public:
 	SLATE_BEGIN_ARGS(SSlateStyleBrowserEditor) {}
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& MajorTab);
+	void Construct(const FArguments& InArgs, const TSharedRef<SDockTab>& MajorTab, TWeakPtr<ISlateStyleDataManager> InSlateStyleDataManager);
 
 private:
 	void FillEditMenu(FMenuBuilder& MenuBuilder);
@@ -43,6 +44,8 @@ private:
 
 private:
 	TSharedPtr<FTabManager> TabManager;
+	TWeakPtr<ISlateStyleDataManager> SlateStyleDataManager;
+	
 	TSharedPtr<SListView<TSharedPtr<FSlateStyleData>>> ListView;
 	TSharedPtr<SComboBox<TSharedPtr<FName>>> StyleSelectionComboBox;
 	TSharedPtr<STypeFilterWidget> TypeFilterWidget;

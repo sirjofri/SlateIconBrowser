@@ -37,3 +37,11 @@ protected:
 	FName Type;
 	FName WidgetStyleType;
 };
+
+class ISlateStyleDataProvider
+{
+public:
+	virtual ~ISlateStyleDataProvider() = default;
+	virtual TSharedPtr<FSlateStyleData> MakeSlateStyleData(const ISlateStyle* SlateStyle, FName PropertyName, FName WidgetType) = 0;
+	virtual TArray<FName> GetSupportedWidgetTypes() = 0;
+};
