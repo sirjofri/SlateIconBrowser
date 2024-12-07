@@ -96,6 +96,7 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 			[
 				SAssignNew(TypeFilterWidget, STypeFilterWidget)
 				.SelectPrompt(LOCTEXT("SelectTypeFilterPrompt", "Select Types"))
+				.ToolTipText(LOCTEXT("SelectTypeFilterToolTip", "Use Shift+Click to select exclusively"))
 				.OnSelectionChanged_Lambda([&](const TArray<FName>& SelectedOptions)
 				{
 					FilterTypes = SelectedOptions;

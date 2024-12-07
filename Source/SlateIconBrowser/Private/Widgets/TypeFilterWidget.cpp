@@ -9,6 +9,7 @@
 void STypeFilterWidget::Construct(const FArguments& InArgs)
 {
 	SelectPrompt = InArgs._SelectPrompt;
+	ToolTipText = InArgs._ToolTipText;
 	OnSelectionChanged = InArgs._OnSelectionChanged;
 	
 	ChildSlot
@@ -43,8 +44,30 @@ void STypeFilterWidget::SelectAll()
 	OnSelectionChanged.ExecuteIfBound(SelectedOptions);
 }
 
+void STypeFilterWidget::SelectOnly(FName Option)
+{
+	// could use Options.Contains, but then I have to MakeShareable(new FName(Option))
+	auto contains = [&](FName o)
+	{
+		for (const TSharedPtr<FName>& N : Options)
+			if (*N == o)
+				return true;
+		return false;
+	};
+	if (!contains(Option))
+		return;
+	SelectedOptions.Empty(1);
+	SelectedOptions.Add(Option);
+
+	OnSelectionChanged.ExecuteIfBound(SelectedOptions);
+}
+
 FReply STypeFilterWidget::ToggleSelection(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FName Name)
 {
+	if (PointerEvent.GetModifierKeys().IsShiftDown()) {
+		SelectOnly(Name);
+		return FReply::Handled();
+	}
 	if (SelectedOptions.Contains(Name)) {
 		SelectedOptions.Remove(Name);
 	} else {
@@ -74,6 +97,7 @@ TSharedRef<SWidget> STypeFilterWidget::GenerateWidget(TSharedPtr<FName> Name)
 	return
 		SNew(SBorder)
 		.BorderImage(EDITOR_STYLE_SAFE()::Get().GetBrush("NoBorder"))
+		.ToolTipText(ToolTipText)
 		.OnMouseButtonDown(this, &STypeFilterWidget::ToggleSelection, *Name)
 		[
 			SNew(SHorizontalBox)
@@ -81,13 +105,14 @@ TSharedRef<SWidget> STypeFilterWidget::GenerateWidget(TSharedPtr<FName> Name)
 			.AutoWidth()
 			.VAlign(VAlign_Center)
 			[
-				SNew(SCheckBox)
-				.IsChecked(this, &STypeFilterWidget::GetOptionCheckState, *Name)
-				.OnCheckStateChanged(this, &STypeFilterWidget::OnCheckStateChanged, *Name)
+				SNew(SImage)
+				.Image(FCoreStyle::Get().GetBrush("Icons.Check"))
+				.Visibility(this, &STypeFilterWidget::GetCheckVisibility, *Name)
 			]
 			+SHorizontalBox::Slot()
 			.FillWidth(1.)
 			.VAlign(VAlign_Center)
+			.Padding(5, 0, 0, 0)
 			[
 				SNew(STextBlock)
 				.Text(FText::FromName(*Name))
@@ -95,7 +120,7 @@ TSharedRef<SWidget> STypeFilterWidget::GenerateWidget(TSharedPtr<FName> Name)
 		];
 }
 
-ECheckBoxState STypeFilterWidget::GetOptionCheckState(FName Name) const
+EVisibility STypeFilterWidget::GetCheckVisibility(FName Name) const
 {
-	return SelectedOptions.Contains(Name) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+	return SelectedOptions.Contains(Name) ? EVisibility::Visible : EVisibility::Hidden;
 }
