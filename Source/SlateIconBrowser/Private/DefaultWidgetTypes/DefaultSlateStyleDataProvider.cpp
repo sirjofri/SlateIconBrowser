@@ -14,12 +14,7 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 		return StyleData; \
 	}
 
-	if (WidgetType == T_TextBlock && SlateStyle->HasWidgetStyle<FTextBlockStyle>(PropertyName)) {
-		const FTextBlockStyle& ws = SlateStyle->GetWidgetStyle<FTextBlockStyle>(PropertyName);
-		TSharedPtr<FSlateStyleData> StyleData = MakeShared<FSlateStyleWidgetTextBlock>();
-		StyleData->Initialize(SlateStyle->GetStyleSetName(), PropertyName, FSlateStyleWidgetTextBlock::TypeName, ws.GetTypeName());
-		return StyleData;
-	};
+	WIDGET(T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
 	
 #undef WIDGET
 	return nullptr;
