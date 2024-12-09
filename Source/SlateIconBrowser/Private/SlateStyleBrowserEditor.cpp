@@ -23,6 +23,8 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 	MakeValidConfiguration();
 	CacheAllStyleNames();
 	InputTextChanged(FText::GetEmpty());
+
+	DockTab = MajorTab;
 	
 	TabManager = FGlobalTabmanager::Get()->NewTabManager(MajorTab);
 	TabManager->SetAllowWindowMenuBar(true);
@@ -152,7 +154,7 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 						.Text(LOCTEXT("HeaderRowWidgetType", "Widget Type"))
 					]
 					+SHeaderRow::Column("Widget")
-					.HAlignCell(HAlign_Right)
+					.HAlignCell(HAlign_Fill)
 					[
 						SNew(STextBlock)
 						.Text(LOCTEXT("HeaderRowWidget", "Visualization"))
@@ -311,6 +313,7 @@ TSharedPtr<SWidget> SSlateStyleBrowserEditor::EntryContextMenu()
 	TArray<TSharedPtr<FSlateStyleData>> Items = ListView->GetSelectedItems();
 	if (Items.Num() != 1)
 		return SNullWidget::NullWidget;
+	TSharedPtr<SDockTab> tab = DockTab.Pin();
 	Items[0]->FillRowContextMenu(MenuBuilder);
 	return MenuBuilder.MakeWidget();
 }

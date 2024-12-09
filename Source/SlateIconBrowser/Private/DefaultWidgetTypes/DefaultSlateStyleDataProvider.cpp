@@ -2,6 +2,7 @@
 
 #include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetTextBlock.h"
+#include "WProgressBar.h"
 
 
 TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(const ISlateStyle* SlateStyle, FName PropertyName,
@@ -17,6 +18,7 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 
 	WIDGET(T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
 	WIDGET(T_Button, FButtonStyle, FSlateStyleWidgetButton);
+	WIDGET(T_ProgressBar, FProgressBarStyle, FWProgressBar);
 	
 #undef WIDGET
 	return nullptr;
@@ -27,5 +29,6 @@ TArray<FName> FDefaultSlateStyleDataProvider::GetSupportedWidgetTypes()
 	return {
 		T_TextBlock,
 		T_Button,
+		T_ProgressBar,
 	};
 }

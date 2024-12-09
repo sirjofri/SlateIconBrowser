@@ -13,7 +13,11 @@ public:
 	void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView);
 
 	virtual TSharedRef<SWidget> GenerateWidgetForColumn(const FName& ColumnName) override;
+	~SSlateStyleTableRow() = default;
+	
+private:
+	static TSharedPtr<IToolTip> GetToolTipWidget(TWeakPtr<FSlateStyleData> InStyleData);
 
 private:
-	TSharedPtr<FSlateStyleData> StyleData;
+	TWeakPtr<FSlateStyleData> StyleData;
 };

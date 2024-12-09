@@ -4,6 +4,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "HAL/PlatformApplicationMisc.h"
+#include "Styling/SlateStyleRegistry.h"
 
 #define LOCTEXT_NAMESPACE "SlateStyleBrowser"
 
@@ -23,6 +24,11 @@ void FSlateStyleData::ClipboardCode(const FString& CopyCode)
 	Info.Text = FText::FromString(CopyText);
 #endif
 	FSlateNotificationManager::Get().AddNotification(Info);
+}
+
+const ISlateStyle* FSlateStyleData::GetSlateStyle()
+{
+	return FSlateStyleRegistry::FindSlateStyle(GetStyleName());
 }
 
 void FSlateStyleData::FillRowContextMenu(FMenuBuilder& MenuBuilder)

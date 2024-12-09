@@ -10,4 +10,5 @@ public:
 private:
 	inline static FName T_TextBlock = FName("TextBlock");
 	inline static FName T_Button = FName("Button");
+	inline static FName T_ProgressBar = FName("ProgressBar");
 };

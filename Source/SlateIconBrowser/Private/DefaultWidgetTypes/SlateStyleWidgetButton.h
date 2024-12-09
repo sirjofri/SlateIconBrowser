@@ -1,13 +1,12 @@
 #pragma once
 #include "SlateStyleData.h"
-#include "Styling/SlateStyleRegistry.h"
 
 class FSlateStyleWidgetButton : public FSlateStyleData
 {
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
-		const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(StyleName);
+		const ISlateStyle* Style = GetSlateStyle();
 		if (!Style)
 			return SNullWidget::NullWidget;
 

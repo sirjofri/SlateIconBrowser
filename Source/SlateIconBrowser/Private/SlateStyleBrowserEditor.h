@@ -44,6 +44,7 @@ private:
 
 private:
 	TSharedPtr<FTabManager> TabManager;
+	TWeakPtr<SDockTab> DockTab;
 	TWeakPtr<ISlateStyleDataManager> SlateStyleDataManager;
 	
 	TSharedPtr<SListView<TSharedPtr<FSlateStyleData>>> ListView;

@@ -12,6 +12,11 @@ class FSlateStyleData
 {
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() = 0;
+
+	// TODO: Don't just use this as tooltip, but as general metadata for filtering etc
+	virtual bool HasDetails() { return false; };
+	virtual TMap<FString,FString> GetDetails() { return {}; };
+	
 	virtual void FillRowContextMenu(FMenuBuilder& MenuBuilder);
 	virtual void CopyDefault(EDefaultCopyStyle DefaultCopyStyle, const FString& QuickStyle);
 
@@ -34,6 +39,14 @@ protected:
 	FString ReadabilityReplace(const FString& Code);
 	FString GenerateCopyCode(const FString& StyleCode);
 	virtual void ClipboardCode(const FString& CopyCode);
+
+	const ISlateStyle* GetSlateStyle();
+
+	template<typename T>
+	const T& GetWidgetStyle()
+	{
+		return GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
+	};
 
 protected:
 	FName StyleName;
