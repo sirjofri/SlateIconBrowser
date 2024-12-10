@@ -1,4 +1,4 @@
-#include "SlateIconBrowserHacker.h"
+#include "SlateStyleBrowserHacker.h"
 
 #if ENGINE_MAJOR_VERSION == 4
 

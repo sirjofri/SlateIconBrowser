@@ -11,7 +11,7 @@ void USlateStyleBrowserUserSettings::PostReloadConfig(class FProperty* PropertyT
 {
 	Super::PostReloadConfig(PropertyThatWasLoaded);
 	
-	if (AllowResetToDefault) {
+	if (AllowResetToDefault || AllEmpty()) {
 		FillWithDefaultStyles();
 		FillWithDefaultReplacements();
 		SaveConfig();
@@ -56,4 +56,9 @@ TArray<FString> USlateStyleBrowserUserSettings::GetValidTypes()
 		TEXT("Brush"),
 		TEXT("TextBlock"),
 	};
+}
+
+bool USlateStyleBrowserUserSettings::AllEmpty()
+{
+	return QuickStyle.IsEmpty() && SelectedStyle == NAME_None && CopyStyles.Num() == 0 && ReadabilityReplacements.Num() == 0;
 }

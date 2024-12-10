@@ -50,6 +50,8 @@ public:
 	UFUNCTION()
 	TArray<FString> GetValidTypes();
 
+	bool AllEmpty();
+
 public:
 	UPROPERTY(Config)
 	FString QuickStyle;

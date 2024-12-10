@@ -4,7 +4,6 @@
 
 class ISlateStyleDataManager;
 class STypeFilterWidget;
-class USlateIconBrowserUserSettings;
 
 class SSlateStyleBrowserEditor : public SCompoundWidget
 {

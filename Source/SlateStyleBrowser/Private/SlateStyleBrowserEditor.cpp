@@ -279,7 +279,7 @@ void SSlateStyleBrowserEditor::FillHelpMenu(FMenuBuilder& MenuBuilder)
 			FUIAction(
 				FExecuteAction::CreateLambda([=]
 				{
-					FPlatformProcess::LaunchURL(TEXT("https://github.com/sirjofri/SlateIconBrowser"), nullptr, nullptr);
+					FPlatformProcess::LaunchURL(TEXT("https://github.com/sirjofri/SlateStyleBrowser"), nullptr, nullptr);
 				})
 			));
 	}

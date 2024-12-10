@@ -1,20 +1,20 @@
 setlocal
 
-md %temp%\SlateIconBrowser
+md %temp%\SlateStyleBrowser
 for %%a in (4.27 5.0 5.1 5.2 5.3 5.4 5.5) do call :build %%a
-rd /s /q %temp%\SlateIconBrowser
+rd /s /q %temp%\SlateStyleBrowser
 goto :eof
 
 :build
 set epic=
 for /f "tokens=2* skip=2" %%a in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Engine\%1" /v "InstalledDirectory"') do set epic=%%b
 if "%epic%"=="" goto :eof
-md %temp%\SlateIconBrowser\%1
-call "%epic%\Engine\Build\BatchFiles\RunUAT.bat" BuildPlugin -Plugin="%CD%\SlateIconBrowser.uplugin" -Package="%temp%\SlateIconBrowser\%1" -Rocket
-rd /s /q %temp%\SlateIconBrowser\%1\Binaries
-rd /s /q %temp%\SlateIconBrowser\%1\Intermediate
-md %temp%\SlateIconBrowser\%1\Config
-copy Config\FilterPlugin.ini %temp%\SlateIconBrowser\%1\Config\FilterPlugin.ini
-del SlateIconBrowser-%1.zip
-tar -a -c -f SlateIconBrowser-%1.zip -C %temp%\SlateIconBrowser\%1\ *
+md %temp%\SlateStyleBrowser\%1
+call "%epic%\Engine\Build\BatchFiles\RunUAT.bat" BuildPlugin -Plugin="%CD%\SlateStyleBrowser.uplugin" -Package="%temp%\SlateStyleBrowser\%1" -Rocket
+rd /s /q %temp%\SlateStyleBrowser\%1\Binaries
+rd /s /q %temp%\SlateStyleBrowser\%1\Intermediate
+md %temp%\SlateStyleBrowser\%1\Config
+copy Config\FilterPlugin.ini %temp%\SlateStyleBrowser\%1\Config\FilterPlugin.ini
+del SlateStyleBrowser-%1.zip
+tar -a -c -f SlateStyleBrowser-%1.zip -C %temp%\SlateStyleBrowser\%1\ *
 goto :eof

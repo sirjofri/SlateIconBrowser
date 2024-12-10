@@ -6,7 +6,7 @@
 #include "Styling/SlateStyle.h"
 
 /**  */
-class FSlateIconBrowserStyle
+class FSlateStyleBrowserStyle
 {
 public:
 

@@ -1,7 +1,7 @@
 // Copyright sirjofri. Licensed under MIT license. See License.txt for full license text.
 
 #pragma once
-#include "SlateIconBrowser/Public/SlateStyleDataManager.h"
+#include "SlateStyleBrowser/Public/SlateStyleDataManager.h"
 
 class ISlateStyleDataProvider;
 

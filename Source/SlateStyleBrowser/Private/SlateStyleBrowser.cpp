@@ -1,11 +1,11 @@
 ﻿// Copyright sirjofri. Licensed under MIT license. See License.txt for full license text.
 
-#include "SlateIconBrowser.h"
+#include "SlateStyleBrowser.h"
 
 #include "DefaultWidgetTypes/DefaultSlateStyleDataProvider.h"
 #include "Framework/Application/MenuStack.h"
 #include "Framework/Application/SlateApplication.h"
-#include "SlateIconBrowserStyle.h"
+#include "SlateStyleBrowserStyle.h"
 #include "Layout/WidgetPath.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Text/STextBlock.h"
@@ -15,39 +15,39 @@
 #include "SlateStyleBrowserEditor.h"
 #include "SlateStyleDataManager.h"
 
-static const FName SlateIconBrowserTabName("SlateIconBrowser");
+static const FName SlateStyleBrowserTabName("SlateStyleBrowser");
 
 #define LOCTEXT_NAMESPACE "SlateStyleBrowser"
 
-void FSlateIconBrowserModule::StartupModule()
+void FSlateStyleBrowserModule::StartupModule()
 {
-	FSlateIconBrowserStyle::Initialize();
-	FSlateIconBrowserStyle::ReloadTextures();
+	FSlateStyleBrowserStyle::Initialize();
+	FSlateStyleBrowserStyle::ReloadTextures();
 
 	SlateStyleDataManager = MakeShared<FSlateStyleDataManager>();
 	TSharedPtr<FDefaultSlateStyleDataProvider> DefaultProvider = MakeShared<FDefaultSlateStyleDataProvider>();
 	SlateStyleDataManager->RegisterWidgetStyleProvider(DefaultProvider);
 
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(SlateIconBrowserTabName, FOnSpawnTab::CreateRaw(this, &FSlateIconBrowserModule::OnSpawnPluginTab))
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(SlateStyleBrowserTabName, FOnSpawnTab::CreateRaw(this, &FSlateStyleBrowserModule::OnSpawnPluginTab))
 		.SetDisplayName(LOCTEXT("SlateStyleBrowserTabTitle", "Slate Style Browser"))
 		.SetGroup(WorkspaceMenu::GetMenuStructure().GetToolsCategory())
-		.SetIcon(FSlateIcon(FSlateIconBrowserStyle::GetStyleSetName(), "SlateStyleBrowser.Icon"))
+		.SetIcon(FSlateIcon(FSlateStyleBrowserStyle::GetStyleSetName(), "SlateStyleBrowser.Icon"))
 		.SetMenuType(ETabSpawnerMenuType::Enabled);
 }
 
-void FSlateIconBrowserModule::ShutdownModule()
+void FSlateStyleBrowserModule::ShutdownModule()
 {
-	FSlateIconBrowserStyle::Shutdown();
-	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(SlateIconBrowserTabName);
+	FSlateStyleBrowserStyle::Shutdown();
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(SlateStyleBrowserTabName);
 }
 
-TSharedPtr<ISlateStyleDataManager> FSlateIconBrowserModule::GetSlateStyleDataManager()
+TSharedPtr<ISlateStyleDataManager> FSlateStyleBrowserModule::GetSlateStyleDataManager()
 {
-	FSlateIconBrowserModule& mod = FModuleManager::Get().LoadModuleChecked<FSlateIconBrowserModule>("SlateIconBrowser");
+	FSlateStyleBrowserModule& mod = FModuleManager::Get().LoadModuleChecked<FSlateStyleBrowserModule>("SlateStyleBrowser");
 	return mod.SlateStyleDataManager;
 }
 
-TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
+TSharedRef<SDockTab> FSlateStyleBrowserModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	const TSharedRef<SDockTab> DockTab = SNew(SDockTab).TabRole(ETabRole::MajorTab);
 	DockTab->SetContent(SNew(SSlateStyleBrowserEditor, DockTab, SlateStyleDataManager));
@@ -56,4 +56,4 @@ TSharedRef<SDockTab> FSlateIconBrowserModule::OnSpawnPluginTab(const FSpawnTabAr
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE(FSlateIconBrowserModule, SlateIconBrowser)
+IMPLEMENT_MODULE(FSlateStyleBrowserModule, SlateStyleBrowser)

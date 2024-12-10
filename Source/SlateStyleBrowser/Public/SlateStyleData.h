@@ -8,7 +8,7 @@ enum EDefaultCopyStyle
 	DCS_QuickStyle,
 };
 
-class SLATEICONBROWSER_API FSlateStyleData
+class SLATESTYLEBROWSER_API FSlateStyleData
 {
 public:
 	// Override this to generate your own visualization widget
@@ -93,7 +93,7 @@ private:
 	TArray<TTuple<FString,FString>> Details;
 };
 
-class SLATEICONBROWSER_API ISlateStyleDataProvider
+class SLATESTYLEBROWSER_API ISlateStyleDataProvider
 {
 public:
 	virtual ~ISlateStyleDataProvider() = default;

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class SlateIconBrowser : ModuleRules
+public class SlateStyleBrowser : ModuleRules
 {
-	public SlateIconBrowser(ReadOnlyTargetRules Target) : base(Target)
+	public SlateStyleBrowser(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
