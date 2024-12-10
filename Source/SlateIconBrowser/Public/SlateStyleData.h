@@ -12,10 +12,11 @@ class FSlateStyleData
 {
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() = 0;
+	virtual TSharedPtr<SWidget> GetExtendedPreview() { return SNullWidget::NullWidget; };
 
-	// TODO: Don't just use this as tooltip, but as general metadata for filtering etc
-	virtual bool HasDetails() { return false; };
-	virtual TMap<FString,FString> GetDetails() { return {}; };
+	virtual bool HasDetails() { return Details.Num() > 0; };
+	virtual TMap<FString,FString>& GetDetails() { return Details; };
+	virtual void InitializeDetails() {};
 	
 	virtual void FillRowContextMenu(FMenuBuilder& MenuBuilder);
 	virtual void CopyDefault(EDefaultCopyStyle DefaultCopyStyle, const FString& QuickStyle);
@@ -29,6 +30,9 @@ public:
 		PropertyName = InPropertyName;
 		Type = InType;
 		WidgetStyleType = InWidgetStyleType;
+
+		Details.Empty();
+		InitializeDetails();
 	};
 	
 	virtual FName GetStyleName() { return StyleName;};
@@ -43,16 +47,29 @@ protected:
 	const ISlateStyle* GetSlateStyle();
 
 	template<typename T>
-	const T& GetWidgetStyle()
+	bool GetWidgetStyle(T& WidgetStyle)
 	{
-		return GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
+		const ISlateStyle* Style = GetSlateStyle();
+		if (!(Style && Style->HasWidgetStyle<T>(GetPropertyName())))
+			return false;
+		WidgetStyle = GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
+		return true;
 	};
+
+	template<typename T>
+	static FString GetEnumValue(T Value)
+	{
+		UEnum* Enum = StaticEnum<T>();
+		return Enum->GetNameStringByValue((int64)Value);
+	}
 
 protected:
 	FName StyleName;
 	FName PropertyName;
 	FName Type;
 	FName WidgetStyleType;
+
+	TMap<FString,FString> Details;
 };
 
 class ISlateStyleDataProvider

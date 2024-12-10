@@ -7,8 +7,8 @@ class FWProgressBar : public FSlateStyleData
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
-		const FProgressBarStyle& s = GetWidgetStyle<FProgressBarStyle>();
-		if (s.GetTypeName() == NAME_None)
+		FProgressBarStyle s;
+		if (!GetWidgetStyle<FProgressBarStyle>(s))
 			return SNullWidget::NullWidget;
 
 		return

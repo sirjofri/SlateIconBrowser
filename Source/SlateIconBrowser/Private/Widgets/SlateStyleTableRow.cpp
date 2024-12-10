@@ -72,12 +72,38 @@ TSharedPtr<IToolTip> SSlateStyleTableRow::GetToolTipWidget(TWeakPtr<FSlateStyleD
 		return nullptr;
 	if (!data->HasDetails())
 		return nullptr;
-	
-	FPropertyEditorModule& Pem = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+	auto IsUpper = [](const FString& Str)
+	{
+		for (int i = 0; i < Str.Len(); i++) {
+			if (!FChar::IsAlpha(Str[i]) || FChar::IsUpper(Str[i]))
+				continue;
+			return false;
+		}
+		return true;
+	};
 
 	TSharedRef<SVerticalBox> box = SNew(SVerticalBox);
 
+	TSharedPtr<SWidget> preview = data->GetExtendedPreview();
+	if (preview.IsValid()) {
+		box->AddSlot().AutoHeight()
+		[
+			SNew(SBorder)
+			.Padding(10, 5)
+			[
+				preview.ToSharedRef()
+			]
+		];
+		box->AddSlot().AutoHeight()
+		[
+			SNew(SSpacer)
+			.Size(FVector2D(10.))
+		];
+	}
+
 	for (TTuple<FString,FString> kv : data->GetDetails()) {
+		bool IsHeading = IsUpper(kv.Key) && kv.Value.IsEmpty();
 		box->AddSlot().AutoHeight()
 		[
 			SNew(SHorizontalBox)
@@ -85,14 +111,14 @@ TSharedPtr<IToolTip> SSlateStyleTableRow::GetToolTipWidget(TWeakPtr<FSlateStyleD
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.TextStyle(&FAppStyle::Get().GetWidgetStyle<FTextBlockStyle>("NormalText.Subdued"))
-				.Text(FText::FromString(kv.Key + TEXT(": ")))
+				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>(IsHeading ? "NormalText.Important" : "NormalText.Subdued"))
+				.Text(FText::FromString(IsHeading ? kv.Key : kv.Key + TEXT(": ")))
 			]
 			+SHorizontalBox::Slot()
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.TextStyle(&FAppStyle::Get().GetWidgetStyle<FTextBlockStyle>("NormalText"))
+				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>("NormalText"))
 				.Text(FText::FromString(kv.Value))
 			]
 		];
