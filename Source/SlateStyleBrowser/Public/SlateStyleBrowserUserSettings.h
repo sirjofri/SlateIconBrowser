@@ -13,6 +13,8 @@ struct FCopyStyleBundle
 	GENERATED_BODY()
 
 public:
+	FCopyStyleBundle() {}
+	
 	UPROPERTY(EditAnywhere, Config, Category="Copy Style")
 	TArray<FString> CopyStyles;
 };

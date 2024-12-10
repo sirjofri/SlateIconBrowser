@@ -35,9 +35,9 @@ public:
 		AddDetail(TEXT("Shadow Color"), s.ShadowColorAndOpacity.ToString());
 		AddDetail(TEXT("Selected Background Color"), s.SelectedBackgroundColor.GetSpecifiedColor().ToString());
 		AddDetail(TEXT("Highlight Color"), s.HighlightColor.GetSpecifiedColor().ToString());
-		AddDetail(TEXT("Highlight Shape"), s.HighlightShape.IsSet() ? TEXT("Yes") : TEXT("No"));
-		AddDetail(TEXT("Strike Brush"), s.StrikeBrush.IsSet() ? TEXT("Yes") : TEXT("No"));
-		AddDetail(TEXT("Underline Brush"), s.UnderlineBrush.IsSet() ? TEXT("Yes") : TEXT("No"));
+		AddDetail(TEXT("Highlight Shape"), GetEnumValue<ESlateBrushDrawType::Type>(s.HighlightShape.DrawAs));
+		AddDetail(TEXT("Strike Brush"), GetEnumValue<ESlateBrushDrawType::Type>(s.StrikeBrush.DrawAs));
+		AddDetail(TEXT("Underline Brush"), GetEnumValue<ESlateBrushDrawType::Type>(s.UnderlineBrush.DrawAs));
 		AddDetail(TEXT("Transform Policy"), GetEnumValue<ETextTransformPolicy>(s.TransformPolicy));
 		AddDetail(TEXT("Overflow Policy"), GetEnumValue<ETextOverflowPolicy>(s.OverflowPolicy));
 

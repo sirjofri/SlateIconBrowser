@@ -29,9 +29,9 @@ public:
 		if (!found)
 			return;
 
-		AddDetail(TEXT("Background Image"), s.BackgroundImage.IsSet() ? TEXT("Is Set") : TEXT("Not Set"));
-		AddDetail(TEXT("Fill Image"), s.FillImage.IsSet() ? TEXT("Is Set") : TEXT("Not Set"));
-		AddDetail(TEXT("Marquee Image"), s.MarqueeImage.IsSet() ? TEXT("Is Set") : TEXT("Not Set"));
+		AddDetail(TEXT("Background Image"), GetEnumValue<ESlateBrushDrawType::Type>(s.BackgroundImage.DrawAs));
+		AddDetail(TEXT("Fill Image"), GetEnumValue<ESlateBrushDrawType::Type>(s.FillImage.DrawAs));
+		AddDetail(TEXT("Marquee Image"), GetEnumValue<ESlateBrushDrawType::Type>(s.MarqueeImage.DrawAs));
 		AddDetail(TEXT("Enable Fill Animation"), s.EnableFillAnimation ? TEXT("Yes") : TEXT("No"));
 
 		// Initialize preview
