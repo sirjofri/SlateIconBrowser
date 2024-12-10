@@ -10,7 +10,7 @@
 
 class FSlateStyleDataManager;
 
-class FSlateIconBrowserModule : public IModuleInterface
+class SLATEICONBROWSER_API FSlateIconBrowserModule : public IModuleInterface
 {
 public:
 

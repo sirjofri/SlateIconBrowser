@@ -3,7 +3,7 @@
 class FSlateStyleData;
 class ISlateStyleDataProvider;
 
-class ISlateStyleDataManager
+class SLATEICONBROWSER_API ISlateStyleDataManager
 {
 public:
 	virtual ~ISlateStyleDataManager() = default;
