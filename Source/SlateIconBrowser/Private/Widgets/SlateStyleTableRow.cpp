@@ -2,6 +2,8 @@
 
 #include "SlateStyleData.h"
 
+#define LOCTEXT_NAMESPACE "SlateStyleBrowser"
+
 #if ENGINE_MAJOR_VERSION == 4
 #define EDITOR_STYLE_SAFE() FEditorStyle
 #else
@@ -27,7 +29,7 @@ TSharedRef<SWidget> SSlateStyleTableRow::GenerateWidgetForColumn(const FName& Co
 			.Padding(5)
 			[
 				SNew(STextBlock)
-				.Text(FText::FromName(data->GetStyleName()))
+				.Text(FText::FromName(data->GetStyleSetName()))
 				.TextStyle(&EDITOR_STYLE_SAFE()::Get().GetWidgetStyle<FTextBlockStyle>(TEXT("NormalText.Subdued")))
 			];
 	}
@@ -55,8 +57,7 @@ TSharedRef<SWidget> SSlateStyleTableRow::GenerateWidgetForColumn(const FName& Co
 			SNew(SBox)
 			.VAlign(VAlign_Center)
 			.HAlign(HAlign_Left)
-			// I would prefer to fetch this lazy (TODO: possible using OnOpening and custom SToolTip class)
-			.ToolTip(GetToolTipWidget(StyleData))
+			.ToolTip(SNew(SSlateStyleToolTip, data))
 			.Padding(5)
 			[
 				data->GenerateRowWidget()
@@ -65,13 +66,32 @@ TSharedRef<SWidget> SSlateStyleTableRow::GenerateWidgetForColumn(const FName& Co
 	return SNullWidget::NullWidget;
 }
 
-TSharedPtr<IToolTip> SSlateStyleTableRow::GetToolTipWidget(TWeakPtr<FSlateStyleData> InStyleData)
+void SSlateStyleToolTip::Construct(const FArguments& InArgs, const TWeakPtr<FSlateStyleData>& InStyleData)
 {
-	TSharedPtr<FSlateStyleData> data = InStyleData.Pin();
+	StyleData = InStyleData;
+
+	SToolTip::FArguments args = SToolTip::FArguments();
+
+	TSharedPtr<FSlateStyleData> data = StyleData.Pin();
+	if (data.IsValid() && (data->HasDetails() || data->GetExtendedPreview().IsValid())) {
+		args.Content()
+		[
+			SNew(SBox)
+		];
+	}
+
+	SToolTip::Construct(args);
+}
+
+void SSlateStyleToolTip::OnOpening()
+{
+	TSharedPtr<FSlateStyleData> data = StyleData.Pin();
 	if (!data.IsValid())
-		return nullptr;
-	if (!data->HasDetails())
-		return nullptr;
+		return;
+
+	TSharedPtr<SWidget> preview = data->GetExtendedPreview();
+	if (!(data->HasDetails() || preview.IsValid()))
+		return;
 
 	auto IsUpper = [](const FString& Str)
 	{
@@ -85,7 +105,6 @@ TSharedPtr<IToolTip> SSlateStyleTableRow::GetToolTipWidget(TWeakPtr<FSlateStyleD
 
 	TSharedRef<SVerticalBox> box = SNew(SVerticalBox);
 
-	TSharedPtr<SWidget> preview = data->GetExtendedPreview();
 	if (preview.IsValid()) {
 		box->AddSlot().AutoHeight()
 		[
@@ -124,13 +143,10 @@ TSharedPtr<IToolTip> SSlateStyleTableRow::GetToolTipWidget(TWeakPtr<FSlateStyleD
 		];
 	}
 	
-	return SNew(SToolTip)
+	SetContentWidget(SNew(SBorder)
+		.BorderImage(EDITOR_STYLE_SAFE()::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
+		.Padding(6)
 		[
-			SNew(SBorder)
-			.BorderImage(EDITOR_STYLE_SAFE()::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
-			.Padding(6)
-			[
-				box
-			]
-		];
+			box
+		]);
 }

@@ -14,9 +14,21 @@ public:
 
 	virtual TSharedRef<SWidget> GenerateWidgetForColumn(const FName& ColumnName) override;
 	~SSlateStyleTableRow() = default;
-	
+
 private:
-	static TSharedPtr<IToolTip> GetToolTipWidget(TWeakPtr<FSlateStyleData> InStyleData);
+	TWeakPtr<FSlateStyleData> StyleData;
+};
+
+class SSlateStyleToolTip : public SToolTip
+{
+public:
+	SLATE_BEGIN_ARGS(SSlateStyleToolTip)
+		{}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs, const TWeakPtr<FSlateStyleData>& InStyleData);
+
+	virtual void OnOpening() override;
 
 private:
 	TWeakPtr<FSlateStyleData> StyleData;

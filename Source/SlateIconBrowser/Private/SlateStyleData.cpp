@@ -28,7 +28,7 @@ void FSlateStyleData::ClipboardCode(const FString& CopyCode)
 
 const ISlateStyle* FSlateStyleData::GetSlateStyle()
 {
-	return FSlateStyleRegistry::FindSlateStyle(GetStyleName());
+	return FSlateStyleRegistry::FindSlateStyle(GetStyleSetName());
 }
 
 void FSlateStyleData::FillRowContextMenu(FMenuBuilder& MenuBuilder)
@@ -102,7 +102,7 @@ FString FSlateStyleData::GenerateCopyCode(const FString& StyleCode)
 {
 	FString code = StyleCode
 		.Replace(TEXT("$1"), *GetPropertyName().ToString())
-		.Replace(TEXT("$2"), *GetStyleName().ToString())
+		.Replace(TEXT("$2"), *GetStyleSetName().ToString())
 		.Replace(TEXT("$3"), WidgetStyleType.IsNone() ? TEXT("$3") : *WidgetStyleType.ToString())
 		.Replace(TEXT("$$"), TEXT("$"));
 

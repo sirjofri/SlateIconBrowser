@@ -15,29 +15,6 @@ public:
 			.Text(INVTEXT("Hello, World!"));
 	};
 
-	virtual TSharedPtr<SWidget> GetExtendedPreview() override
-	{
-		FTextBlockStyle s;
-		if (!GetWidgetStyle<FTextBlockStyle>(s))
-			return SNullWidget::NullWidget;
-	
-		return SNew(SVerticalBox)
-			+SVerticalBox::Slot()
-			.AutoHeight()
-			[
-				SNew(STextBlock)
-				.TextStyle(&s)
-				.Text(INVTEXT("the quick brown fox jumps over the lazy dog! 01234"))
-			]
-			+SVerticalBox::Slot()
-			.AutoHeight()
-			[
-				SNew(STextBlock)
-				.TextStyle(&s)
-				.Text(INVTEXT("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG! 56789"))
-			];
-	};
-
 	virtual void InitializeDetails() override
 	{
 		FTextBlockStyle s;
@@ -76,5 +53,22 @@ public:
 		Details.Add(TEXT("\t\tColor"), s.Font.OutlineSettings.OutlineColor.ToString());
 
 #undef OBJNAME
+
+		// Initialize Extended Preview
+		ExtendedPreview = SNew(SVerticalBox)
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				SNew(STextBlock)
+				.TextStyle(&s)
+				.Text(INVTEXT("the quick brown fox jumps over the lazy dog! 01234"))
+			]
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				SNew(STextBlock)
+				.TextStyle(&s)
+				.Text(INVTEXT("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG! 56789"))
+			];
 	};
 };
