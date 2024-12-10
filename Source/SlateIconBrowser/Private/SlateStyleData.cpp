@@ -31,6 +31,27 @@ const ISlateStyle* FSlateStyleData::GetSlateStyle()
 	return FSlateStyleRegistry::FindSlateStyle(GetStyleSetName());
 }
 
+void FSlateStyleData::AddDetail(const FString& Name, const FString& Value)
+{
+	Details.Add(TTuple<FString,FString>(Name, Value));
+}
+
+FString FSlateStyleData::MarginString(FMargin Margin)
+{
+	if (Margin.Left == Margin.Right && Margin.Top == Margin.Bottom) {
+		if (Margin.Left == Margin.Top) {
+			return FString::Printf(TEXT("%f"), Margin.Left);
+		} else {
+			return FString::Printf(TEXT("%f %f"), Margin.Left, Margin.Top);
+		}
+	}
+	return FString::Printf(TEXT("%f %f %f %f"),
+		Margin.Left,
+		Margin.Top,
+		Margin.Right,
+		Margin.Bottom);
+}
+
 void FSlateStyleData::FillRowContextMenu(FMenuBuilder& MenuBuilder)
 {
 	const USlateStyleBrowserUserSettings* Settings = GetDefault<USlateStyleBrowserUserSettings>();

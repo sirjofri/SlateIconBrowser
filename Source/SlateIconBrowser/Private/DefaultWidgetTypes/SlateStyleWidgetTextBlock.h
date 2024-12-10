@@ -6,51 +6,58 @@ class FSlateStyleWidgetTextBlock : public FSlateStyleData
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
-		FTextBlockStyle s;
-		if (!GetWidgetStyle<FTextBlockStyle>(s))
+		bool found;
+		const FTextBlockStyle& s = GetWidgetStyle<FTextBlockStyle>(found);
+		if (!found)
 			return SNullWidget::NullWidget;
 	
-		return SNew(STextBlock)
-			.TextStyle(&s)
-			.Text(INVTEXT("Hello, World!"));
+		return SNew(SBox)
+			.VAlign(VAlign_Center)
+			.HAlign(HAlign_Left)
+			[
+				SNew(STextBlock)
+				.TextStyle(&s)
+				.Text(INVTEXT("Hello, World!"))
+			];
 	};
 
 	virtual void InitializeDetails() override
 	{
-		FTextBlockStyle s;
-		if (!GetWidgetStyle<FTextBlockStyle>(s))
+		bool found;
+		const FTextBlockStyle& s = GetWidgetStyle<FTextBlockStyle>(found);
+		if (!found)
 			return;
 
 #define OBJNAME(OBJ) (IsValid(OBJ) ? OBJ->GetName() : TEXT("None"))
 		
-		Details.Add(TEXT("Color"), s.ColorAndOpacity.GetSpecifiedColor().ToString());
-		Details.Add(TEXT("Shadow Offset"), s.ShadowOffset.ToString());
-		Details.Add(TEXT("Shadow Color"), s.ShadowColorAndOpacity.ToString());
-		Details.Add(TEXT("Selected Background Color"), s.SelectedBackgroundColor.GetSpecifiedColor().ToString());
-		Details.Add(TEXT("Highlight Color"), s.HighlightColor.GetSpecifiedColor().ToString());
-		Details.Add(TEXT("Highlight Shape"), s.HighlightShape.IsSet() ? TEXT("Yes") : TEXT("No"));
-		Details.Add(TEXT("Strike Brush"), s.StrikeBrush.IsSet() ? TEXT("Yes") : TEXT("No"));
-		Details.Add(TEXT("Underline Brush"), s.UnderlineBrush.IsSet() ? TEXT("Yes") : TEXT("No"));
-		Details.Add(TEXT("Transform Policy"), GetEnumValue<ETextTransformPolicy>(s.TransformPolicy));
-		Details.Add(TEXT("Overflow Policy"), GetEnumValue<ETextOverflowPolicy>(s.OverflowPolicy));
+		AddDetail(TEXT("Color"), s.ColorAndOpacity.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("Shadow Offset"), s.ShadowOffset.ToString());
+		AddDetail(TEXT("Shadow Color"), s.ShadowColorAndOpacity.ToString());
+		AddDetail(TEXT("Selected Background Color"), s.SelectedBackgroundColor.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("Highlight Color"), s.HighlightColor.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("Highlight Shape"), s.HighlightShape.IsSet() ? TEXT("Yes") : TEXT("No"));
+		AddDetail(TEXT("Strike Brush"), s.StrikeBrush.IsSet() ? TEXT("Yes") : TEXT("No"));
+		AddDetail(TEXT("Underline Brush"), s.UnderlineBrush.IsSet() ? TEXT("Yes") : TEXT("No"));
+		AddDetail(TEXT("Transform Policy"), GetEnumValue<ETextTransformPolicy>(s.TransformPolicy));
+		AddDetail(TEXT("Overflow Policy"), GetEnumValue<ETextOverflowPolicy>(s.OverflowPolicy));
 
-		Details.Add(TEXT("FONT"), TEXT(""));
-		Details.Add(TEXT("\tFont Family"), OBJNAME(s.Font.FontObject));
-		Details.Add(TEXT("\tSize"), FString::Printf(TEXT("%f"), s.Font.Size));
-		Details.Add(TEXT("\tLetter Spacing"), FString::Printf(TEXT("%d"), s.Font.LetterSpacing));
-		Details.Add(TEXT("\tSkew"), FString::Printf(TEXT("%f"), s.Font.SkewAmount));
-		Details.Add(TEXT("\tTypefaceFontName"), s.Font.TypefaceFontName.ToString());
+		AddDetail(TEXT("FONT"), TEXT(""));
+		AddDetail(TEXT("\tFont Family"), OBJNAME(s.Font.FontObject));
+		AddDetail(TEXT("\tSize"), FString::Printf(TEXT("%f"), s.Font.Size));
+		AddDetail(TEXT("\tLetter Spacing"), FString::Printf(TEXT("%d"), s.Font.LetterSpacing));
+		AddDetail(TEXT("\tSkew"), FString::Printf(TEXT("%f"), s.Font.SkewAmount));
+		AddDetail(TEXT("\tTypefaceFontName"), s.Font.TypefaceFontName.ToString());
 		if (s.Font.bForceMonospaced) {
-			Details.Add(TEXT("\tMonospaced Width"), FString::Printf(TEXT("%f"), s.Font.MonospacedWidth));
+			AddDetail(TEXT("\tMonospaced Width"), FString::Printf(TEXT("%f"), s.Font.MonospacedWidth));
 		}
-		Details.Add(TEXT("\tMaterial"), OBJNAME(s.Font.FontMaterial));
-		Details.Add(TEXT("\tOUTLINE"), TEXT(""));
-		Details.Add(TEXT("\t\tSize"), FString::Printf(TEXT("%d"), s.Font.OutlineSettings.OutlineSize));
-		Details.Add(TEXT("\t\tCorners"), s.Font.OutlineSettings.bMiteredCorners ? TEXT("Mitered") : TEXT("Rounded"));
-		Details.Add(TEXT("\t\tSeparate Fill Alpha"), s.Font.OutlineSettings.bSeparateFillAlpha ? TEXT("Yes") : TEXT("No"));
-		Details.Add(TEXT("\t\tApply to Drop Shadows"), s.Font.OutlineSettings.bApplyOutlineToDropShadows ? TEXT("Yes") : TEXT("No"));
-		Details.Add(TEXT("\t\tMaterial"), OBJNAME(s.Font.OutlineSettings.OutlineMaterial));
-		Details.Add(TEXT("\t\tColor"), s.Font.OutlineSettings.OutlineColor.ToString());
+		AddDetail(TEXT("\tMaterial"), OBJNAME(s.Font.FontMaterial));
+		AddDetail(TEXT("\tOUTLINE"), TEXT(""));
+		AddDetail(TEXT("\t\tSize"), FString::Printf(TEXT("%d"), s.Font.OutlineSettings.OutlineSize));
+		AddDetail(TEXT("\t\tCorners"), s.Font.OutlineSettings.bMiteredCorners ? TEXT("Mitered") : TEXT("Rounded"));
+		AddDetail(TEXT("\t\tSeparate Fill Alpha"), s.Font.OutlineSettings.bSeparateFillAlpha ? TEXT("Yes") : TEXT("No"));
+		AddDetail(TEXT("\t\tApply to Drop Shadows"), s.Font.OutlineSettings.bApplyOutlineToDropShadows ? TEXT("Yes") : TEXT("No"));
+		AddDetail(TEXT("\t\tMaterial"), OBJNAME(s.Font.OutlineSettings.OutlineMaterial));
+		AddDetail(TEXT("\t\tColor"), s.Font.OutlineSettings.OutlineColor.ToString());
 
 #undef OBJNAME
 

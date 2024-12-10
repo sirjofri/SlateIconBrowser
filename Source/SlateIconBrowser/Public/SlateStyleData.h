@@ -21,7 +21,7 @@ public:
 	virtual void CopyDefault(EDefaultCopyStyle DefaultCopyStyle, const FString& QuickStyle);
 	
 	virtual TSharedPtr<SWidget> GetExtendedPreview() { return ExtendedPreview; };
-	virtual TMap<FString,FString>& GetDetails() { return Details; };
+	virtual TArray<TTuple<FString,FString>>& GetDetails() { return Details; };
 	virtual bool HasDetails() { return Details.Num() > 0; };
 
 	
@@ -54,13 +54,15 @@ protected:
 	 * @return true if the widget style exists (success)
 	 */
 	template<typename T>
-	bool GetWidgetStyle(T& WidgetStyle)
+	const T& GetWidgetStyle(bool &Found)
 	{
 		const ISlateStyle* Style = GetSlateStyle();
-		if (!(Style && Style->HasWidgetStyle<T>(GetPropertyName())))
-			return false;
-		WidgetStyle = GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
-		return true;
+		if (!(Style && Style->HasWidgetStyle<T>(GetPropertyName()))) {
+			Found = false;
+			return T::GetDefault();
+		}
+		Found = true;
+		return GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
 	};
 
 	// Helper function to get the string value for the specified Enum type
@@ -71,16 +73,24 @@ protected:
 		return Enum->GetNameStringByValue((int64)Value);
 	}
 
+	void AddDetail(const FString& Name, const FString& Value);
+#define AddDetailf(Name, Format, ...) AddDetail(Name, FString::Printf(Format, ##__VA_ARGS__))
+
+protected:
+	static FString MarginString(FMargin Margin);
+
 protected:
 	FName StyleSetName;
 	FName PropertyName;
 	FName Type;
 	FName WidgetStyleType;
 
-	// This holds various metadata for the tooltip display
-	TMap<FString,FString> Details;
 	// This is the extended preview that's visible within the tooltip
 	TSharedPtr<SWidget> ExtendedPreview = nullptr;
+
+private:
+	// This holds various metadata for the tooltip display
+	TArray<TTuple<FString,FString>> Details;
 };
 
 class ISlateStyleDataProvider

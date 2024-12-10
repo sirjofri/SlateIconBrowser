@@ -54,9 +54,10 @@ TSharedRef<SWidget> SSlateStyleTableRow::GenerateWidgetForColumn(const FName& Co
 	}
 	if (ColumnName == TEXT("Widget")) {
 		return
-			SNew(SBox)
-			.VAlign(VAlign_Center)
-			.HAlign(HAlign_Left)
+			SNew(SBorder)
+			.BorderImage(FCoreStyle::Get().GetBrush("NoBorder"))
+			.VAlign(VAlign_Fill)
+			.HAlign(HAlign_Fill)
 			.ToolTip(SNew(SSlateStyleToolTip, data))
 			.Padding(5)
 			[
@@ -122,7 +123,7 @@ void SSlateStyleToolTip::OnOpening()
 	}
 
 	for (TTuple<FString,FString> kv : data->GetDetails()) {
-		bool IsHeading = IsUpper(kv.Key) && kv.Value.IsEmpty();
+		bool IsHeading = kv.Value.IsEmpty(); // IsUpper() needed?
 		box->AddSlot().AutoHeight()
 		[
 			SNew(SHorizontalBox)
