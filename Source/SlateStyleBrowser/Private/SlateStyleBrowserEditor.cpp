@@ -9,6 +9,10 @@
 #include "Widgets/SlateStyleTableRow.h"
 #include "Widgets/TypeFilterWidget.h"
 
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 2
+#include "Widgets/Layout/SSeparator.h"
+#endif
+
 #if ENGINE_MAJOR_VERSION == 4
 #include "Widgets/Layout/SSeparator.h"
 #include "Styling/SlateStyle.h"
