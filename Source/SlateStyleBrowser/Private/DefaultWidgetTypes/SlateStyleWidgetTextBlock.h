@@ -58,7 +58,7 @@ public:
 #endif
 		AddDetail(TEXT("\tTypefaceFontName"), s.Font.TypefaceFontName.ToString());
 		
-#if ENGINE_MAJOR_VERSION == 5
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION > 3
 		if (s.Font.bForceMonospaced) {
 			AddDetail(TEXT("\tMonospaced Width"), FString::Printf(TEXT("%f"), s.Font.MonospacedWidth));
 		}
@@ -66,7 +66,7 @@ public:
 		AddDetail(TEXT("\tMaterial"), OBJNAME(s.Font.FontMaterial));
 		AddDetail(TEXT("\tOUTLINE"), TEXT(""));
 		AddDetail(TEXT("\t\tSize"), FString::Printf(TEXT("%d"), s.Font.OutlineSettings.OutlineSize));
-#if ENGINE_MAJOR_VERSION == 5
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION > 3
 		AddDetail(TEXT("\t\tCorners"), s.Font.OutlineSettings.bMiteredCorners ? TEXT("Mitered") : TEXT("Rounded"));
 #endif
 		AddDetail(TEXT("\t\tSeparate Fill Alpha"), s.Font.OutlineSettings.bSeparateFillAlpha ? TEXT("Yes") : TEXT("No"));
