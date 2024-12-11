@@ -2,7 +2,7 @@
 
 #include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetTextBlock.h"
-#include "WProgressBar.h"
+#include "SlateStyleWidgetProgressBar.h"
 
 namespace DefaultSupportedTypes
 {
@@ -24,7 +24,7 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 
 	WIDGET(DefaultSupportedTypes::T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
 	WIDGET(DefaultSupportedTypes::T_Button, FButtonStyle, FSlateStyleWidgetButton);
-	WIDGET(DefaultSupportedTypes::T_ProgressBar, FProgressBarStyle, FWProgressBar);
+	WIDGET(DefaultSupportedTypes::T_ProgressBar, FProgressBarStyle, FSlateStyleWidgetProgressBar);
 	
 #undef WIDGET
 	return nullptr;

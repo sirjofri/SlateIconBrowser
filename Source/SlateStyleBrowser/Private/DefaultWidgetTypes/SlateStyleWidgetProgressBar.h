@@ -2,7 +2,7 @@
 #include "SlateStyleData.h"
 #include "Widgets/Notifications/SProgressBar.h"
 
-class FWProgressBar : public FSlateStyleData
+class FSlateStyleWidgetProgressBar : public FSlateStyleData
 {
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
