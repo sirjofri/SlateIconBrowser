@@ -106,7 +106,11 @@ TSharedRef<SWidget> STypeFilterWidget::GenerateWidget(TSharedPtr<FName> Name)
 			.VAlign(VAlign_Center)
 			[
 				SNew(SImage)
+#if ENGINE_MAJOR_VERSION == 5
 				.Image(FCoreStyle::Get().GetBrush("Icons.Check"))
+#else
+				.Image(FEditorStyle::Get().GetBrush("Symbols.Check"))
+#endif
 				.Visibility(this, &STypeFilterWidget::GetCheckVisibility, *Name)
 			]
 			+SHorizontalBox::Slot()

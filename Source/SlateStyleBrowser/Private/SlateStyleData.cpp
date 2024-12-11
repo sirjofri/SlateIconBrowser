@@ -21,7 +21,7 @@ void FSlateStyleData::ClipboardCode(const FString& CopyCode)
 #if ENGINE_MAJOR_VERSION == 5
 	Info.SubText = FText::FromString(CopyCode);
 #else
-	Info.Text = FText::FromString(CopyText);
+	Info.Text = FText::FromString(CopyCode);
 #endif
 	FSlateNotificationManager::Get().AddNotification(Info);
 }

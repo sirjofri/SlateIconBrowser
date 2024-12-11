@@ -3,11 +3,14 @@
 
 #define LOCTEXT_NAMESPACE "SlateStyleBrowserBrush"
 
+namespace FSlateStyleBrushDefaultValues
+{
+	FName TypeName = FName("Brush");
+};
+
 class FSlateStyleBrush : public FSlateStyleData
 {
 public:
-	inline static FName TypeName = FName("Brush");
-	
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
 		GetBrush();
@@ -25,6 +28,11 @@ public:
 	#endif
 				.Image(Brush)
 			];
+	};
+
+	virtual void Initialize(FName InStyle, FName InPropertyName, FName InType, FName InWidgetStyleType) override
+	{
+		FSlateStyleData::Initialize(InStyle, InPropertyName, FSlateStyleBrushDefaultValues::TypeName, InWidgetStyleType);
 	};
 
 	virtual void InitializeDetails() override

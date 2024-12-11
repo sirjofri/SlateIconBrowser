@@ -110,7 +110,7 @@ void SSlateStyleToolTip::OnOpening()
 		box->AddSlot().AutoHeight()
 		[
 			SNew(SBorder)
-			.Padding(10, 5)
+			.Padding(FMargin(10, 5))
 			[
 				preview.ToSharedRef()
 			]

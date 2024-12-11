@@ -3,6 +3,18 @@
 
 #define LOCTEXT_NAMESPACE "SlateStyleBrowser"
 
+#if ENGINE_MAJOR_VERSION == 5
+#define NORMALFOREGROUND NormalForeground.GetSpecifiedColor()
+#define HOVEREDFOREGROUND HoveredForeground.GetSpecifiedColor()
+#define PRESSEDFOREGROUND PressedForeground.GetSpecifiedColor()
+#define DISABLEDFOREGROUND DisabledForeground.GetSpecifiedColor()
+#else
+#define NORMALFOREGROUND Normal.TintColor.GetSpecifiedColor()
+#define HOVEREDFOREGROUND Hovered.TintColor.GetSpecifiedColor()
+#define PRESSEDFOREGROUND Pressed.TintColor.GetSpecifiedColor()
+#define DISABLEDFOREGROUND Disabled.TintColor.GetSpecifiedColor()
+#endif
+
 class FSlateStyleWidgetButton : public FSlateStyleData
 {
 public:
@@ -39,22 +51,22 @@ public:
 		FText PreviewText = bWantsText ? INVTEXT("Hello, World!") : FText::GetEmpty();
 
 		AddDetail(TEXT("NORMAL"), TEXT(""));
-		AddDetail(TEXT("\tForeground"), s.NormalForeground.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("\tForeground"), s.NORMALFOREGROUND.ToString());
 		AddDetail(TEXT("\tPadding"), MarginString(s.NormalPadding));
 
 		AddDetail(TEXT("HOVERED"), TEXT(""));
-		AddDetail(TEXT("\tForeground"), s.HoveredForeground.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("\tForeground"), s.HOVEREDFOREGROUND.ToString());
 		AddDetail(TEXT("\tSound"), IsValid(s.HoveredSlateSound.GetResourceObject()) ?
 			s.HoveredSlateSound.GetResourceObject()->GetName() : TEXT("None"));
 
 		AddDetail(TEXT("PRESSED"), TEXT(""));
-		AddDetail(TEXT("\tForeground"), s.PressedForeground.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("\tForeground"), s.PRESSEDFOREGROUND.ToString());
 		AddDetail(TEXT("\tPadding"), MarginString(s.PressedPadding));
 		AddDetail(TEXT("\tSound"), IsValid(s.PressedSlateSound.GetResourceObject()) ?
 			s.HoveredSlateSound.GetResourceObject()->GetName() : TEXT("None"));
 
 		AddDetail(TEXT("DISABLED"), TEXT(""));
-		AddDetail(TEXT("\tForeground"), s.DisabledForeground.GetSpecifiedColor().ToString());
+		AddDetail(TEXT("\tForeground"), s.DISABLEDFOREGROUND.ToString());
 
 		// Extended Preview
 		// TODO: Disable for now. Crash: UObject garbage collection due to culling of the SButtons.

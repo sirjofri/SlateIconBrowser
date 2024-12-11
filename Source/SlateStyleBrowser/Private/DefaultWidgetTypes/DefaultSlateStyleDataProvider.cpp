@@ -4,6 +4,12 @@
 #include "SlateStyleWidgetTextBlock.h"
 #include "WProgressBar.h"
 
+namespace DefaultSupportedTypes
+{
+	static FName T_TextBlock = FName("TextBlock");
+	static FName T_Button = FName("Button");
+	static FName T_ProgressBar = FName("ProgressBar");
+};
 
 TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(const ISlateStyle* SlateStyle, FName PropertyName,
                                                                                FName WidgetType)
@@ -16,9 +22,9 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 		return StyleData; \
 	}
 
-	WIDGET(T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
-	WIDGET(T_Button, FButtonStyle, FSlateStyleWidgetButton);
-	WIDGET(T_ProgressBar, FProgressBarStyle, FWProgressBar);
+	WIDGET(DefaultSupportedTypes::T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
+	WIDGET(DefaultSupportedTypes::T_Button, FButtonStyle, FSlateStyleWidgetButton);
+	WIDGET(DefaultSupportedTypes::T_ProgressBar, FProgressBarStyle, FWProgressBar);
 	
 #undef WIDGET
 	return nullptr;
@@ -27,8 +33,8 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 TArray<FName> FDefaultSlateStyleDataProvider::GetSupportedWidgetTypes()
 {
 	return {
-		T_TextBlock,
-		T_Button,
-		T_ProgressBar,
+		DefaultSupportedTypes::T_TextBlock,
+		DefaultSupportedTypes::T_Button,
+		DefaultSupportedTypes::T_ProgressBar,
 	};
 }

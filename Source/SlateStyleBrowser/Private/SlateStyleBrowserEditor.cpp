@@ -1,5 +1,6 @@
 #include "SlateStyleBrowserEditor.h"
 
+#include "SlateStyleBrowserHacker.h"
 #include "SlateStyleBrowserUserSettings.h"
 #include "DefaultWidgetTypes/SlateStyleBrush.h"
 #include "SlateStyleData.h"
@@ -7,6 +8,11 @@
 #include "Styling/SlateStyleRegistry.h"
 #include "Widgets/SlateStyleTableRow.h"
 #include "Widgets/TypeFilterWidget.h"
+
+#if ENGINE_MAJOR_VERSION == 4
+#include "Widgets/Layout/SSeparator.h"
+#include "Styling/SlateStyle.h"
+#endif
 
 #if ENGINE_MAJOR_VERSION == 4
 #define EDITOR_STYLE_SAFE() FEditorStyle
@@ -27,10 +33,16 @@ void SSlateStyleBrowserEditor::Construct(const FArguments& InArgs, const TShared
 	DockTab = MajorTab;
 	
 	TabManager = FGlobalTabmanager::Get()->NewTabManager(MajorTab);
+#if ENGINE_MAJOR_VERSION == 5
 	TabManager->SetAllowWindowMenuBar(true);
+#endif
 	FMenuBarBuilder MenuBarBuilder = FMenuBarBuilder(TSharedPtr<FUICommandList>());
 	BuildTabMenu(MenuBarBuilder);
+#if ENGINE_MAJOR_VERSION == 5
 	TabManager->SetMenuMultiBox(MenuBarBuilder.GetMultiBox(), MenuBarBuilder.MakeWidget());
+#else
+	TabManager->SetMenuMultiBox(MenuBarBuilder.GetMultiBox());
+#endif
 
 	ChildSlot
 	[
@@ -429,7 +441,7 @@ TSharedPtr<FSlateStyleData> SSlateStyleBrowserEditor::MakeSlateStyleData(const I
 	// This is not ideal! Default brushes won't appear at all this way.
 	if (Brush && Brush != SlateStyle->GetDefaultBrush()) {
 		StyleData = MakeShared<FSlateStyleBrush>();
-		StyleData->Initialize(Style, PropertyName, FSlateStyleBrush::TypeName, NAME_None);
+		StyleData->Initialize(Style, PropertyName, NAME_None, NAME_None);
 		return StyleData;
 	}
 	
