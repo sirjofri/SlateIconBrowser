@@ -1,50 +1,62 @@
-# Slate Icon Browser
+# Slate Style Browser
 
-This small tool lets you browse Unreal Engine's Editor icons/brushes easily, search for specific ones and copy slate code for the selected icon.
+This small tool lets you browse Unreal Engine's Slate styles easily, search for specific ones and copy slate code for the selected style or brush.
 
 ![Screenshot of the window](Documentation/WindowScreenshot.png)
 
 ## Invocation
 
-When the plugin is activated there's only one window which you can open via `Tools -> Slate Icon Browser`.
+When the plugin is activated there's only one window which you can open via `Tools -> Slate Style Browser`.
 
 ## Features
 
 ### Searching
 
-Using the search bar it's possible to filter the icons based on their names.
+Using the search bar it's possible to filter the styles based on their names.
 
 ### Select a Style Set
 
 Using a dropdown menu you can select another style set besides the default Editor style.
 
-### Non-Image Brushes
+### Select a Style Type
 
-Non-image brushes (like solid colors) will be displayed with a default size as a simple square.
+The tool supports various different types, which you can select using another dropdown menu.
 
 ### Copying Slate Code
 
-Slate Icon Browser supports multiple code copying styles:
+Slate Style Browser supports multiple code copying styles you can set up and use.
+In addition to your custom presets, you can always type some _quick style_ right into the tool window.
 
-* `FSlateIcon(...)`
-* `FSlateIconFinder::FindIcon(...)`
-* Custom style
+To adjust the presets:
 
-The first two are quite obvious: They allow copying C++ code like the following:
+* `Edit` &rarr; `Editor Preferences`
+* `Plugins` &rarr; `Slate Style Browser`
+* Configure as you like (see also: [Configuration](#Configuration))
 
-    FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icon")
-    FSlateIcon(FName("SomeStyle"), "Icon")
-    FSlateIconFinder::FindIcon("Icon")
+To reset the configuration to a default, you first have to check the `Allow Reset to Default` checkbox, then click the `Reset to Defaults` button.
 
-A few default styles will be replaced by the generic class call (like `FAppStyle::GetAppStyleSetName()`) while others will be copied as a FName reference instead (using `FName("SomeStyleSet")`).
+Within the copy styles, there are a few placeholders that will be replaced:
 
-_Custom Style_ is a little different: It allows you to specify a code fragment manually in a separate input field.
-In this input field, the string `$1` will be replaced by the code of the icon.
+* `$1` is the property name
+* `$2` is the style set name
+* `$3` is the widget style type
+* `$$` is just `$`
 
-All three copy styles are also available in the context menu that appears by right-clicking a list entry.
+In addition to that, there are generic replacements that can help to:
+
+* replace `FSlateStyleRegistry::FindSlateStyle("AppStyle")` with `FAppStyle::Get()`
+* replace `FSlateStyleRegistry::FindSlateStyle("CoreStyle")` with `FCoreStyle::Get()`
+* etc.
 
 As with everything source-code related you are supposed to read it before you include it and adjust it to make it work in your environment.
 
+## Configuration
+
+(`Editor Preferences` &rarr; `Plugins` &rarr; `Slate Style Browser`)
+
+* `Allow Reset to Default`: Check to make the `Reset to Defaults` button work.
+* `Copy Styles`: Per type, set preset copy styles here.
+* `Readability Replacements`: Automatically replace text to enhance readability of copied code.
 
 ---
 
