@@ -53,7 +53,7 @@ public:
 		AddDetail(TEXT("\tFont Family"), OBJNAME(s.Font.FontObject));
 		AddDetail(TEXT("\tSize"), FString::Printf(TEXT("%f"), s.Font.Size));
 		AddDetail(TEXT("\tLetter Spacing"), FString::Printf(TEXT("%d"), s.Font.LetterSpacing));
-#if ENGINE_MAJOR_VERSION == 5
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION > 1
 		AddDetail(TEXT("\tSkew"), FString::Printf(TEXT("%f"), s.Font.SkewAmount));
 #endif
 		AddDetail(TEXT("\tTypefaceFontName"), s.Font.TypefaceFontName.ToString());

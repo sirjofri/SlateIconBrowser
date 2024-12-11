@@ -145,7 +145,7 @@ void SSlateStyleToolTip::OnOpening()
 	}
 	
 	SetContentWidget(SNew(SBorder)
-		.BorderImage(EDITOR_STYLE_SAFE()::GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
+		.BorderImage(EDITOR_STYLE_SAFE()::Get().GetBrush("ContentBrowser.TileViewTooltip.ContentBorder"))
 		.Padding(6)
 		[
 			box
