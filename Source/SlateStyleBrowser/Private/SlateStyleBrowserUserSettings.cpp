@@ -1,5 +1,7 @@
 #include "SlateStyleBrowserUserSettings.h"
 
+#include "SlateStyleBrowser.h"
+
 
 USlateStyleBrowserUserSettings::USlateStyleBrowserUserSettings()
 {
@@ -50,12 +52,13 @@ void USlateStyleBrowserUserSettings::FillWithDefaultReplacements()
 	ReadabilityReplacements.Add(TEXT("FSlateStyleRegistry::FindSlateStyle(\"UMGStyle\")"), TEXT("FUMGStyle::Get()"));
 }
 
-TArray<FString> USlateStyleBrowserUserSettings::GetValidTypes()
+TArray<FName> USlateStyleBrowserUserSettings::GetValidTypes()
 {
-	return {
-		TEXT("Brush"),
-		TEXT("TextBlock"),
-	};
+	TArray<FName> RegisteredTypes;
+	FSlateStyleBrowserModule& mod = FModuleManager::LoadModuleChecked<FSlateStyleBrowserModule>(TEXT("SlateStyleBrowser"));
+	TSharedPtr<ISlateStyleDataManager> mgr = mod.GetSlateStyleDataManager();
+	mgr->GetRegisteredTypes(RegisteredTypes);
+	return RegisteredTypes;
 }
 
 bool USlateStyleBrowserUserSettings::AllEmpty()

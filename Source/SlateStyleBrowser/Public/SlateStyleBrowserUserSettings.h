@@ -54,7 +54,7 @@ public:
 	TMap<FString,FString> ReadabilityReplacements;
 
 	UFUNCTION()
-	TArray<FString> GetValidTypes();
+	TArray<FName> GetValidTypes();
 
 	bool AllEmpty();
 
