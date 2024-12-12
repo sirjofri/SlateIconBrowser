@@ -2,16 +2,26 @@
 
 #include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetCheckBox.h"
+#include "SlateStyleWidgetComboBox.h"
 #include "SlateStyleWidgetTextBlock.h"
 #include "SlateStyleWidgetProgressBar.h"
+#include "SlateStyleWidgetSlider.h"
+
+#define DEFTYPES(OP) \
+	OP(TextBlock, FTextBlockStyle) \
+	OP(Button, FButtonStyle) \
+	OP(ComboBox, FComboBoxStyle) \
+	OP(ProgressBar, FProgressBarStyle) \
+	OP(CheckBox, FCheckBoxStyle) \
+	OP(Slider, FSliderStyle) \
 
 namespace DefaultSupportedTypes
 {
-	static FName T_TextBlock = FName("TextBlock");
-	static FName T_Button = FName("Button");
-	static FName T_ProgressBar = FName("ProgressBar");
-	static FName T_CheckBox = FName("CheckBox");
+#define DONAMELIST(TYPE, STYLE) static FName T_##TYPE = FName(#TYPE);
+	DEFTYPES(DONAMELIST)
+#undef DONAMELIST
 };
+
 
 TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(const ISlateStyle* SlateStyle, FName PropertyName,
                                                                                FName WidgetType)
@@ -24,10 +34,9 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 		return StyleData; \
 	}
 
-	WIDGET(DefaultSupportedTypes::T_TextBlock, FTextBlockStyle, FSlateStyleWidgetTextBlock);
-	WIDGET(DefaultSupportedTypes::T_Button, FButtonStyle, FSlateStyleWidgetButton);
-	WIDGET(DefaultSupportedTypes::T_ProgressBar, FProgressBarStyle, FSlateStyleWidgetProgressBar);
-	WIDGET(DefaultSupportedTypes::T_CheckBox, FCheckBoxStyle, FSlateStyleWidgetCheckBox);
+#define DOWIDGETLIST(TYPE, STYLE) WIDGET(DefaultSupportedTypes::T_##TYPE, STYLE, FSlateStyleWidget##TYPE);
+	DEFTYPES(DOWIDGETLIST)
+#undef DOWIDGETLIST
 	
 #undef WIDGET
 	return nullptr;
@@ -36,9 +45,8 @@ TSharedPtr<FSlateStyleData> FDefaultSlateStyleDataProvider::MakeSlateStyleData(c
 TArray<FName> FDefaultSlateStyleDataProvider::GetSupportedWidgetTypes()
 {
 	return {
-		DefaultSupportedTypes::T_TextBlock,
-		DefaultSupportedTypes::T_Button,
-		DefaultSupportedTypes::T_ProgressBar,
-		DefaultSupportedTypes::T_CheckBox,
+#define DOLIST(TYPE, STYLE) DefaultSupportedTypes::T_##TYPE,
+		DEFTYPES(DOLIST)
+#undef DOLIST
 	};
 }
