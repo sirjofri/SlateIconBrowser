@@ -3,6 +3,7 @@
 #include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetCheckBox.h"
 #include "SlateStyleWidgetComboBox.h"
+#include "SlateStyleWidgetExpandableArea.h"
 #include "SlateStyleWidgetTextBlock.h"
 #include "SlateStyleWidgetProgressBar.h"
 #include "SlateStyleWidgetSlider.h"
@@ -14,6 +15,7 @@
 	OP(ProgressBar, FProgressBarStyle) \
 	OP(CheckBox, FCheckBoxStyle) \
 	OP(Slider, FSliderStyle) \
+	OP(ExpandableArea, FExpandableAreaStyle) \
 
 namespace DefaultSupportedTypes
 {
