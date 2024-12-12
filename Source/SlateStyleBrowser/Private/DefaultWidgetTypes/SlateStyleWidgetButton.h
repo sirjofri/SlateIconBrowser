@@ -23,7 +23,7 @@ public:
 			[
 				SNew(SButton)
 				.ButtonStyle(s)
-				.Text(bWantsText ? INVTEXT("Hello, World!") : FText::GetEmpty())
+				.Text(bWantsText ? DefaultValues.HelloWorld : FText::GetEmpty())
 			];
 	};
 

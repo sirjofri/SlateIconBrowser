@@ -16,7 +16,7 @@ public:
 			[
 				SNew(STextBlock)
 				.TextStyle(s)
-				.Text(INVTEXT("Hello, World!"))
+				.Text(DefaultValues.HelloWorld)
 			];
 	};
 

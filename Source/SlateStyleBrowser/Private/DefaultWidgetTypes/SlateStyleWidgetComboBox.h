@@ -18,7 +18,7 @@ public:
 				.ComboBoxStyle(s)
 				[
 					SNew(STextBlock)
-					.Text(INVTEXT("Hello, World!"))
+					.Text(DefaultValues.HelloWorld)
 				]
 			];
 	};

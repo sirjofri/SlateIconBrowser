@@ -35,6 +35,15 @@ public:
 	virtual FName GetPropertyName() { return PropertyName; };
 	virtual FName GetType() { return Type; };
 
+	// A collection of default values which can be used by everyone
+	struct DefaultValuesStruct
+	{
+#define LOCTEXT_NAMESPACE "SlateStyleBrowser"
+		FText HelloWorld = LOCTEXT("Default.HelloWorld", "Hello, World!");
+#undef LOCTEXT_NAMESPACE
+	};
+	DefaultValuesStruct DefaultValues;
+
 protected:
 	FString ReadabilityReplace(const FString& Code);
 	FString GenerateCopyCode(const FString& StyleCode);
