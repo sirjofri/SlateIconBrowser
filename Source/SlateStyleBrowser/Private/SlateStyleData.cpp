@@ -247,6 +247,18 @@ void FSlateStyleData::CopyDefault(EDefaultCopyStyle DefaultCopyStyle, const FStr
 	ClipboardCode(GenerateCopyCode(CopyStyles->CopyStyles[0]));
 }
 
+void FSlateStyleData::Initialize(FName InStyle, FName InPropertyName, FName InType, FName InWidgetStyleType) {
+	StyleSetName = InStyle;
+	PropertyName = InPropertyName;
+	Type = InType;
+	WidgetStyleType = InWidgetStyleType;
+
+	Details.Empty();
+	
+	InitializeDetails();
+	InitializePreview();
+}
+
 FString FSlateStyleData::ReadabilityReplace(const FString& Code)
 {
 	const USlateStyleBrowserUserSettings* Settings = GetDefault<USlateStyleBrowserUserSettings>();

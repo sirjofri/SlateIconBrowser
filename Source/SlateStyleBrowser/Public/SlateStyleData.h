@@ -16,6 +16,8 @@ public:
 
 	// Override this to fill in the Details map as well as the ExtendedPreview
 	virtual void InitializeDetails() {};
+	// Override this to generate the extended preview
+	virtual void InitializePreview() {};
 	
 	virtual void FillRowContextMenu(FMenuBuilder& MenuBuilder);
 	virtual void CopyDefault(EDefaultCopyStyle DefaultCopyStyle, const FString& QuickStyle);
@@ -27,17 +29,7 @@ public:
 	
 	virtual ~FSlateStyleData() = default;
 
-	virtual void Initialize(FName InStyle, FName InPropertyName, FName InType, FName InWidgetStyleType)
-	{
-		StyleSetName = InStyle;
-		PropertyName = InPropertyName;
-		Type = InType;
-		WidgetStyleType = InWidgetStyleType;
-
-		Details.Empty();
-		// TODO: maybe run FillDetailsWithProperties() by default?
-		InitializeDetails();
-	};
+	virtual void Initialize(FName InStyle, FName InPropertyName, FName InType, FName InWidgetStyleType);;
 	
 	virtual FName GetStyleSetName() { return StyleSetName;};
 	virtual FName GetPropertyName() { return PropertyName; };
@@ -55,15 +47,13 @@ protected:
 	 * @return true if the widget style exists (success)
 	 */
 	template<typename T>
-	const T& GetWidgetStyle(bool &Found)
+	const T* GetWidgetStyle()
 	{
 		const ISlateStyle* Style = GetSlateStyle();
 		if (!(Style && Style->HasWidgetStyle<T>(GetPropertyName()))) {
-			Found = false;
-			return T::GetDefault();
+			return nullptr;
 		}
-		Found = true;
-		return GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
+		return &GetSlateStyle()->GetWidgetStyle<T>(GetPropertyName());
 	};
 
 	// Helper function to get the string value for the specified Enum type
@@ -83,10 +73,9 @@ protected:
 	template<typename T>
 	void FillDetailsWithProperties()
 	{
-		bool found;
-		const T& ws = GetWidgetStyle<T>(found);
-		if (found)
-			FillDetailsInternal(T::StaticStruct(), &ws, 0);
+		const T* ws = GetWidgetStyle<T>();
+		if (ws)
+			FillDetailsInternal(T::StaticStruct(), ws, 0);
 	};
 
 protected:

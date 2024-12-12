@@ -6,9 +6,8 @@ class FSlateStyleWidgetTextBlock : public FSlateStyleData
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
-		bool found;
-		const FTextBlockStyle& s = GetWidgetStyle<FTextBlockStyle>(found);
-		if (!found)
+		const FTextBlockStyle* s = GetWidgetStyle<FTextBlockStyle>();
+		if (!s)
 			return SNullWidget::NullWidget;
 	
 		return SNew(SBox)
@@ -16,19 +15,21 @@ public:
 			.HAlign(HAlign_Left)
 			[
 				SNew(STextBlock)
-				.TextStyle(&s)
+				.TextStyle(s)
 				.Text(INVTEXT("Hello, World!"))
 			];
 	};
 
 	virtual void InitializeDetails() override
 	{
-		bool found;
-		const FTextBlockStyle& s = GetWidgetStyle<FTextBlockStyle>(found);
-		if (!found)
-			return;
-
 		FillDetailsWithProperties<FTextBlockStyle>();
+	};
+
+	virtual void InitializePreview() override
+	{
+		const FTextBlockStyle* s = GetWidgetStyle<FTextBlockStyle>();
+		if (!s)
+			return;
 
 		// Initialize Extended Preview
 		ExtendedPreview = SNew(SVerticalBox)
@@ -36,14 +37,14 @@ public:
 			.AutoHeight()
 			[
 				SNew(STextBlock)
-				.TextStyle(&s)
+				.TextStyle(s)
 				.Text(INVTEXT("the quick brown fox jumps over the lazy dog! 01234"))
 			]
 			+SVerticalBox::Slot()
 			.AutoHeight()
 			[
 				SNew(STextBlock)
-				.TextStyle(&s)
+				.TextStyle(s)
 				.Text(INVTEXT("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG! 56789"))
 			];
 	};

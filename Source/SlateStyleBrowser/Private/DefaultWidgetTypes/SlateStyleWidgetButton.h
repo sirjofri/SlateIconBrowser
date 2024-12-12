@@ -8,39 +8,39 @@ class FSlateStyleWidgetButton : public FSlateStyleData
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
-		bool found;
-		const FButtonStyle& s = GetWidgetStyle<FButtonStyle>(found);
-		if (!found)
+		const FButtonStyle* s = GetWidgetStyle<FButtonStyle>();
+		if (!s)
 			return SNullWidget::NullWidget;
 
 		// Assumption:
 		// - if we have no image, we want text
 		// - if the image we have doesn't want to tile, we want text
-		bool bWantsText = s.Normal.ImageType == ESlateBrushImageType::NoImage || s.Normal.Tiling != ESlateBrushTileType::NoTile;
+		bool bWantsText = s->Normal.ImageType == ESlateBrushImageType::NoImage || s->Normal.Tiling != ESlateBrushTileType::NoTile;
 
 		return SNew(SBox)
 			.VAlign(VAlign_Center)
 			.HAlign(HAlign_Left)
 			[
 				SNew(SButton)
-				.ButtonStyle(&s)
+				.ButtonStyle(s)
 				.Text(bWantsText ? INVTEXT("Hello, World!") : FText::GetEmpty())
 			];
 	};
 
 	virtual void InitializeDetails() override
 	{
-		bool found;
-		const FButtonStyle& s = GetWidgetStyle<FButtonStyle>(found);
-		if (!found)
-			return;
-
 		FillDetailsWithProperties<FButtonStyle>();
+	};
 
-		// Extended Preview
+	virtual void InitializePreview() override
+	{
 		// TODO: Disable for now. Crash: UObject garbage collection due to culling of the SButtons.
 		// Probably: resources in the FButtonStyle local copies.
 #if 0
+		const FButtonStyle* s = GetWidgetStyle<FButtonStyle>();
+		if (!s)
+			return;
+
 		FButtonStyle sNormal = FButtonStyle(s);
 		FButtonStyle sHovered = FButtonStyle(s).SetNormal(s.Hovered);
 		FButtonStyle sPressed = FButtonStyle(s).SetNormal(s.Pressed);

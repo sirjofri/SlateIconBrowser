@@ -6,9 +6,8 @@ class FSlateStyleWidgetCheckBox : public FSlateStyleData
 public:
 	virtual TSharedRef<SWidget> GenerateRowWidget() override
 	{
-		bool found;
-		const FCheckBoxStyle& s = GetWidgetStyle<FCheckBoxStyle>(found);
-		if (!found)
+		const FCheckBoxStyle* s = GetWidgetStyle<FCheckBoxStyle>();
+		if (!s)
 			return SNullWidget::NullWidget;
 
 		return SNew(SBox)
@@ -20,21 +19,21 @@ public:
 				.AutoWidth()
 				[
 					SNew(SCheckBox)
-					.Style(&s)
+					.Style(s)
 					.IsChecked_Lambda([]() { return ECheckBoxState::Unchecked; })
 				]
 				+SHorizontalBox::Slot()
 				.AutoWidth()
 				[
 					SNew(SCheckBox)
-					.Style(&s)
+					.Style(s)
 					.IsChecked_Lambda([]() { return ECheckBoxState::Checked; })
 				]
 				+SHorizontalBox::Slot()
 				.AutoWidth()
 				[
 					SNew(SCheckBox)
-					.Style(&s)
+					.Style(s)
 					.IsChecked_Lambda([]() { return ECheckBoxState::Undetermined;})
 				]
 			];

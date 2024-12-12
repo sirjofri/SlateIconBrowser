@@ -38,7 +38,6 @@ public:
 	virtual void InitializeDetails() override
 	{
 		const FSlateBrush* brush = GetBrush();
-
 		FillDetailsInternal(FSlateBrush::StaticStruct(), brush, 0);
 	};
 
