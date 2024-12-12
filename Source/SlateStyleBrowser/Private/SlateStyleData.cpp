@@ -118,7 +118,7 @@ void FSlateStyleData::FillDetailsInternal(const UScriptStruct* Struct, const voi
 			}
 
 			// custom standard types
-#if ENGINE_MAJOR_VERSION == 4 || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 1)
+#if ENGINE_MAJOR_VERSION == 4 || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION > 1)
 			if (p->Struct == FDeprecateSlateVector2D::StaticStruct()) {
 				FDeprecateSlateVector2D* ptr = (FDeprecateSlateVector2D*)SubStruct;
 				AddDetail(lvl(p->GetDisplayNameText().ToString()), ptr->ToString());
