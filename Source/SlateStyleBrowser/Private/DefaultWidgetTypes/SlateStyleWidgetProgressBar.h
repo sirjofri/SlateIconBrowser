@@ -28,14 +28,8 @@ public:
 		const FProgressBarStyle& s = GetWidgetStyle<FProgressBarStyle>(found);
 		if (!found)
 			return;
-
-		AddDetail(TEXT("Background Image"), GetEnumValue<ESlateBrushDrawType::Type>(s.BackgroundImage.DrawAs));
-		AddDetail(TEXT("Fill Image"), GetEnumValue<ESlateBrushDrawType::Type>(s.FillImage.DrawAs));
-		AddDetail(TEXT("Marquee Image"), GetEnumValue<ESlateBrushDrawType::Type>(s.MarqueeImage.DrawAs));
 		
-#if ENGINE_MAJOR_VERSION == 5
-		AddDetail(TEXT("Enable Fill Animation"), s.EnableFillAnimation ? TEXT("Yes") : TEXT("No"));
-#endif
+		FillDetailsWithProperties<FProgressBarStyle>();
 
 		// Initialize preview
 		ExtendedPreview = SNew(SBox)

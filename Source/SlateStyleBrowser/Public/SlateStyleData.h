@@ -35,6 +35,7 @@ public:
 		WidgetStyleType = InWidgetStyleType;
 
 		Details.Empty();
+		// TODO: maybe run FillDetailsWithProperties() by default?
 		InitializeDetails();
 	};
 	
@@ -73,11 +74,27 @@ protected:
 		return Enum->GetNameStringByValue((int64)Value);
 	}
 
+	// Add detail by name and value
 	void AddDetail(const FString& Name, const FString& Value);
+	// Add detail by name and value using format string
 #define AddDetailf(Name, Format, ...) AddDetail(Name, FString::Printf(Format, ##__VA_ARGS__))
 
+	// Automatically fill all the details with the properties in the template struct
+	template<typename T>
+	void FillDetailsWithProperties()
+	{
+		bool found;
+		const T& ws = GetWidgetStyle<T>(found);
+		if (found)
+			FillDetailsInternal(T::StaticStruct(), &ws, 0);
+	};
+
 protected:
+	// generate string for FMargin struct
 	static FString MarginString(FMargin Margin);
+
+	// Fill details using a custom struct class and a custom container
+	void FillDetailsInternal(const UScriptStruct* Struct, const void* Container, int Level=0);
 
 protected:
 	FName StyleSetName;

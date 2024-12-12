@@ -37,26 +37,9 @@ public:
 
 	virtual void InitializeDetails() override
 	{
-		GetBrush();
+		const FSlateBrush* brush = GetBrush();
 
-#define ADDENUM(TYPE, DISP, FUNC) AddDetail(TEXT(DISP), GetEnumValue<TYPE>(Brush->FUNC));
-		
-		ADDENUM(ESlateBrushImageType::Type, "Image Type", GetImageType());
-		
-		if (Brush->GetImageType() != ESlateBrushImageType::NoImage) {
-			AddDetail(TEXT("Resource Name"), Brush->GetResourceName().ToString());
-			AddDetail(TEXT("Image Size"), Brush->GetImageSize().ToString());
-		}
-
-		AddDetail(TEXT("Margin"), MarginString(Brush->GetMargin()));
-
-		ADDENUM(ESlateBrushDrawType::Type, "Draw As", GetDrawType());
-		ADDENUM(ESlateBrushMirrorType::Type, "Mirroring", GetMirroring());
-		ADDENUM(ESlateBrushTileType::Type, "Tiling", GetTiling());
-
-		AddDetail(TEXT("Tint Color"), Brush->TintColor.GetSpecifiedColor().ToString());
-
-#undef ADDENUM
+		FillDetailsInternal(FSlateBrush::StaticStruct(), brush, 0);
 	};
 
 private:
