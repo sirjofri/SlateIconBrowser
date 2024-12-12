@@ -38,4 +38,8 @@ TSharedPtr<FSlateStyleData> FSlateStyleDataManager::MakeSlateStyleData(const ISl
 void FSlateStyleDataManager::GetRegisteredTypes(TArray<FName>& OutTypes)
 {
 	StyleDataProviders.GetKeys(OutTypes);
+	Algo::Sort(OutTypes, [](const FName& A, const FName& B)
+	{
+		return A.ToString() < B.ToString();
+	});
 }
