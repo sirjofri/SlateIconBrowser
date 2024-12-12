@@ -118,11 +118,13 @@ void FSlateStyleData::FillDetailsInternal(const UScriptStruct* Struct, const voi
 			}
 
 			// custom standard types
+#if ENGINE_MAJOR_VERSION == 4 || (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION < 1)
 			if (p->Struct == FDeprecateSlateVector2D::StaticStruct()) {
 				FDeprecateSlateVector2D* ptr = (FDeprecateSlateVector2D*)SubStruct;
 				AddDetail(lvl(p->GetDisplayNameText().ToString()), ptr->ToString());
 				continue;
 			}
+#endif
 
 			// custom types
 			if (p->Struct == FSlateBrush::StaticStruct()) {
@@ -176,6 +178,21 @@ void FSlateStyleData::FillDetailsInternal(const UScriptStruct* Struct, const voi
 		if (FBoolProperty* p = CastField<FBoolProperty>(*It)) {
 			const bool* ptr = p->ContainerPtrToValuePtr<bool>(Container);
 			AddDetail(lvl(p->GetDisplayNameText().ToString()), *ptr ? TEXT("true") : TEXT("false"));
+			continue;
+		}
+		if (FIntProperty* p = CastField<FIntProperty>(*It)) {
+			const int* ptr = p->ContainerPtrToValuePtr<int>(Container);
+			AddDetailf(lvl(p->GetDisplayNameText().ToString()), TEXT("%d"), *ptr);
+			continue;
+		}
+		if (FFloatProperty* p = CastField<FFloatProperty>(*It)) {
+			const float* ptr = p->ContainerPtrToValuePtr<float>(Container);
+			AddDetailf(lvl(p->GetDisplayNameText().ToString()), TEXT("%f"), *ptr);
+			continue;
+		}
+		if (FDoubleProperty* p = CastField<FDoubleProperty>(*It)) {
+			const double* ptr = p->ContainerPtrToValuePtr<double>(Container);
+			AddDetailf(lvl(p->GetDisplayNameText().ToString()), TEXT("%f"), *ptr);
 			continue;
 		}
 		if (FNameProperty* p = CastField<FNameProperty>(*It)) {
