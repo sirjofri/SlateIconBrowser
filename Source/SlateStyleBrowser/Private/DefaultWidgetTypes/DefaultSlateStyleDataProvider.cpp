@@ -3,6 +3,7 @@
 #include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetCheckBox.h"
 #include "SlateStyleWidgetComboBox.h"
+#include "SlateStyleWidgetEditableText.h"
 #include "SlateStyleWidgetEditableTextBox.h"
 #include "SlateStyleWidgetExpandableArea.h"
 #include "SlateStyleWidgetTextBlock.h"
@@ -18,6 +19,7 @@
 	OP(Slider, FSliderStyle) \
 	OP(ExpandableArea, FExpandableAreaStyle) \
 	OP(EditableTextBox, FEditableTextBoxStyle) \
+	OP(EditableText, FEditableTextStyle) \
 
 namespace DefaultSupportedTypes
 {
