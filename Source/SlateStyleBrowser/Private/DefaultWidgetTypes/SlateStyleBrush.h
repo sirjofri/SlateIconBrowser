@@ -1,8 +1,6 @@
 #pragma once
 #include "SlateStyleData.h"
 
-#define LOCTEXT_NAMESPACE "SlateStyleBrowserBrush"
-
 namespace FSlateStyleBrushDefaultValues
 {
 	FName TypeName = FName("Brush");

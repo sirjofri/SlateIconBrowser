@@ -14,7 +14,9 @@ public:
 			.Style(s)
 			.Orientation(Orient_Horizontal)
 			+SSplitter::Slot()
+#if ENGINE_MAJOR_VERSION == 5
 			.Resizable(true)
+#endif
 			.Value(0.5)
 			[
 				SNew(SBorder)
@@ -24,7 +26,9 @@ public:
 				]
 			]
 			+SSplitter::Slot()
+#if ENGINE_MAJOR_VERSION == 5
 			.Resizable(true)
+#endif
 			[
 				SNew(SBorder)
 				[
