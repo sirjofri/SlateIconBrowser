@@ -3,23 +3,33 @@
 #include "SlateStyleWidgetButton.h"
 #include "SlateStyleWidgetCheckBox.h"
 #include "SlateStyleWidgetComboBox.h"
+#include "SlateStyleWidgetComboButton.h"
 #include "SlateStyleWidgetEditableText.h"
 #include "SlateStyleWidgetEditableTextBox.h"
 #include "SlateStyleWidgetExpandableArea.h"
+#include "SlateStyleWidgetHyperlink.h"
 #include "SlateStyleWidgetTextBlock.h"
 #include "SlateStyleWidgetProgressBar.h"
+#include "SlateStyleWidgetScrollBar.h"
+#include "SlateStyleWidgetSearchBox.h"
 #include "SlateStyleWidgetSlider.h"
+#include "SlateStyleWidgetSpinBox.h"
 
 #define DEFTYPES(OP) \
 	OP(TextBlock, FTextBlockStyle) \
 	OP(Button, FButtonStyle) \
 	OP(ComboBox, FComboBoxStyle) \
+	OP(ComboButton, FComboButtonStyle) \
 	OP(ProgressBar, FProgressBarStyle) \
 	OP(CheckBox, FCheckBoxStyle) \
 	OP(Slider, FSliderStyle) \
 	OP(ExpandableArea, FExpandableAreaStyle) \
 	OP(EditableTextBox, FEditableTextBoxStyle) \
 	OP(EditableText, FEditableTextStyle) \
+	OP(Hyperlink, FHyperlinkStyle) \
+	OP(SpinBox, FSpinBoxStyle) \
+	OP(ScrollBar, FScrollBarStyle) \
+	OP(SearchBox, FSearchBoxStyle) \
 
 namespace DefaultSupportedTypes
 {
