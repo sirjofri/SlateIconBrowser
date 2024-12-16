@@ -14,6 +14,7 @@
 #include "SlateStyleWidgetSearchBox.h"
 #include "SlateStyleWidgetSlider.h"
 #include "SlateStyleWidgetSpinBox.h"
+#include "Interfaces/IPluginManager.h"
 
 #define DEFTYPES(OP) \
 	OP(TextBlock, FTextBlockStyle) \
@@ -65,4 +66,15 @@ TArray<FName> FDefaultSlateStyleDataProvider::GetSupportedWidgetTypes()
 		DEFTYPES(DOLIST)
 #undef DOLIST
 	};
+}
+
+TArray<FString> FDefaultSlateStyleDataProvider::GetDefaultCopyStyles(FName WidgetType)
+{
+	TArray<FString> Ret;
+	FString Config = IPluginManager::Get().FindPlugin("SlateStyleBrowser")->GetBaseDir() / TEXT("Config") / TEXT("DefaultSlateStyleBrowser.ini");
+	FConfigFile File;
+	File.Read(Config);
+	File.GetArray(TEXT("DefaultCopyStyles"), *WidgetType.ToString(), Ret);
+	Ret.Add(TEXT("FSlateStyleRegistry::FindSlateStyle(\"$2\")->GetWidgetStyle<$3>(\"$1\")"));
+	return Ret;
 }

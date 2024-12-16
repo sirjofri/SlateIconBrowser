@@ -43,3 +43,11 @@ void FSlateStyleDataManager::GetRegisteredTypes(TArray<FName>& OutTypes)
 		return A.ToString() < B.ToString();
 	});
 }
+
+TArray<FString> FSlateStyleDataManager::GetDefaultCopyStyles(FName Type)
+{
+	TSharedPtr<ISlateStyleDataProvider> prov = GetSlateStyleDataProvider(Type);
+	if (!prov.IsValid())
+		return {};
+	return prov->GetDefaultCopyStyles(Type);
+}

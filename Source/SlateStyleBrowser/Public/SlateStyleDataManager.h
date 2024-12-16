@@ -12,4 +12,5 @@ public:
 	virtual TSharedPtr<ISlateStyleDataProvider> GetSlateStyleDataProvider(FName InWidgetType) = 0;
 	virtual TSharedPtr<FSlateStyleData> MakeSlateStyleData(const ISlateStyle* SlateStyle, FName PropertyName, FName WidgetType) = 0;
 	virtual void GetRegisteredTypes(TArray<FName>& OutTypes) = 0;
+	virtual TArray<FString> GetDefaultCopyStyles(FName Type) = 0;
 };

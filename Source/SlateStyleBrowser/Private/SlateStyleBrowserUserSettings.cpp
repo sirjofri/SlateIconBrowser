@@ -25,20 +25,23 @@ void USlateStyleBrowserUserSettings::PostReloadConfig(class FProperty* PropertyT
 void USlateStyleBrowserUserSettings::FillWithDefaultStyles()
 {
 	CopyStyles.Empty();
-
-	{
+	
+	{ // Special case: brushes
 		TArray<FString> styles {
 			TEXT("FSlateIcon(FName(\"$2\"), \"$1\")"),
 			TEXT("FSlateIconFinder::FindIcon(\"$1\")"),
 		};
 		CopyStyles.Add(FName("Brush"), FCopyStyleBundle(styles));
 	}
-	{
-		// TODO: find a way to automate adding these based on ValidTypes
-		TArray<FString> styles {
-			TEXT("FSlateStyleRegistry::FindSlateStyle(\"$2\")->GetWidgetStyle<FTextBlockStyle>(\"$1\")"),
-		};
-		CopyStyles.Add(FName("TextBlock"), FCopyStyleBundle(styles));
+
+	// load from registry defaults
+	TArray<FName> RegisteredTypes;
+	FSlateStyleBrowserModule& mod = FModuleManager::LoadModuleChecked<FSlateStyleBrowserModule>(TEXT("SlateStyleBrowser"));
+	TSharedPtr<ISlateStyleDataManager> mgr = mod.GetSlateStyleDataManager();
+	mgr->GetRegisteredTypes(RegisteredTypes);
+	
+	for (FName t : RegisteredTypes) {
+		CopyStyles.Add(t, FCopyStyleBundle(mgr->GetDefaultCopyStyles(t)));
 	}
 }
 

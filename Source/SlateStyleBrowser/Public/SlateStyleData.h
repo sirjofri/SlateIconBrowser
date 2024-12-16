@@ -114,4 +114,5 @@ public:
 	virtual ~ISlateStyleDataProvider() = default;
 	virtual TSharedPtr<FSlateStyleData> MakeSlateStyleData(const ISlateStyle* SlateStyle, FName PropertyName, FName WidgetType) = 0;
 	virtual TArray<FName> GetSupportedWidgetTypes() = 0;
+	virtual TArray<FString> GetDefaultCopyStyles(FName WidgetType) { return {}; };
 };
