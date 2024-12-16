@@ -36,6 +36,7 @@ TSharedRef<SWidget> SSlateStyleTableRow::GenerateWidgetForColumn(const FName& Co
 	if (ColumnName == TEXT("PropertyName")) {
 		return SNew(SBox)
 			.VAlign(VAlign_Center)
+			.ToolTip(SNew(SSlateStyleToolTip, data))
 			.Padding(5)
 			[
 				SNew(STextBlock)
@@ -58,7 +59,6 @@ TSharedRef<SWidget> SSlateStyleTableRow::GenerateWidgetForColumn(const FName& Co
 			.BorderImage(FCoreStyle::Get().GetBrush("NoBorder"))
 			.VAlign(VAlign_Fill)
 			.HAlign(HAlign_Fill)
-			.ToolTip(SNew(SSlateStyleToolTip, data))
 			.Padding(5)
 			[
 				data->GenerateRowWidget()
