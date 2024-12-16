@@ -31,6 +31,9 @@ private:
 
 	USlateStyleBrowserUserSettings* GetConfig();
 	void MakeValidConfiguration();
+	
+	static bool FilterByString(const TArray<FString>& Tokens, const FString& String);
+	static bool FilterByMeta(const TArray<FString>& Tokens, TSharedPtr<FSlateStyleData> Data);
 
 private:
 	TArray<TSharedPtr<FSlateStyleData>> Lines;
@@ -39,6 +42,7 @@ private:
 	TArray<FName> FilterTypes;
 
 	FString FilterString;
+	FTimerHandle FilterStringChangedTimer;
 	EDefaultCopyStyle DefaultCopyStyle = DCS_FirstEntry;
 
 private:

@@ -14,6 +14,14 @@ When the plugin is activated there's only one window which you can open via `Too
 
 Using the search bar it's possible to filter the styles based on their names.
 
+You may enter multiple words (separated by space) for (case-insensitive) filtering, as well as tuples for filtering details; for example:
+
+* `Check Doc` will search for all property names that include `Check` and `Doc`.
+* `ResourceName=` will be ignored (no value!)
+* `ResourceName=Check` will search for all entries that contain a details field that matches `ResourceName` and which value contains `Check`, for example, a brush with the `Resource Name` of `../checkerboard.svg`.
+
+Filtering happens automatically after entering text, with a short delay to reduce lags.
+
 ### Select a Style Set
 
 Using a dropdown menu you can select another style set besides the default Editor style.

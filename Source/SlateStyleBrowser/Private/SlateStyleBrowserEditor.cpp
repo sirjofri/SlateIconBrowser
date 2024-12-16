@@ -363,6 +363,8 @@ void SSlateStyleBrowserEditor::SelectCodeStyle(EDefaultCopyStyle CopyCodeStyle)
 
 void SSlateStyleBrowserEditor::UpdateList()
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(SSlateStyleBrowserEditor_UpdateList);
+	
 	auto LoadFilteredForStyle = [&](FName& StyleName)
 	{
 		const ISlateStyle* Style = FSlateStyleRegistry::FindSlateStyle(StyleName);
@@ -388,11 +390,15 @@ void SSlateStyleBrowserEditor::UpdateList()
 		Lines.Reserve(Lines.Num() + keys.Num());
 
 		for (FName key : keys) {
-			if (FilterString.IsEmpty() || key.ToString().Contains(FilterString)) {
+			TArray<FString> FilterTokens;
+			FilterString.ParseIntoArray(FilterTokens, TEXT(" "));
+			if (FilterString.IsEmpty() || FilterByString(FilterTokens, key.ToString())) {
 				TSharedPtr<FSlateStyleData> d = MakeSlateStyleData(Style, StyleName, key);
 				if (!d)
 					continue;
 				if (!FilterTypes.Contains(d->GetType()))
+					continue;
+				if (!FilterByMeta(FilterTokens, d))
 					continue;
 				Lines.Add(d);
 			}
@@ -417,7 +423,13 @@ void SSlateStyleBrowserEditor::UpdateList()
 void SSlateStyleBrowserEditor::InputTextChanged(const FText& Text)
 {
 	FilterString = Text.ToString();
-	UpdateList();
+	
+	// update delayed
+	GEditor->GetTimerManager()->SetTimer(FilterStringChangedTimer, [&]()
+	{
+		UpdateList();
+		FilterStringChangedTimer.Invalidate();
+	}, 0.1, false);
 }
 
 TSharedPtr<FSlateStyleData> SSlateStyleBrowserEditor::MakeSlateStyleData(const ISlateStyle* SlateStyle, FName Style,
@@ -460,4 +472,40 @@ void SSlateStyleBrowserEditor::MakeValidConfiguration()
 	if (GetConfig()->SelectedStyle.IsNone()) {
 		GetConfig()->SelectedStyle = Name_AllStyles;
 	}
+}
+
+bool SSlateStyleBrowserEditor::FilterByString(const TArray<FString>& Tokens, const FString& String)
+{
+	for (const FString& Token : Tokens) {
+		if (Token.Contains(TEXT("=")))
+			continue;
+		if (!String.Contains(Token, ESearchCase::IgnoreCase))
+			return false;
+	}
+	return true;
+}
+
+bool SSlateStyleBrowserEditor::FilterByMeta(const TArray<FString>& Tokens, TSharedPtr<FSlateStyleData> Data)
+{
+	TArray<TTuple<FString,FString>> Details = Data->GetDetails();
+	for (const FString& Token : Tokens) {
+		if (!Token.Contains(TEXT("=")))
+			continue;
+		TArray<FString> Line;
+		Token.ParseIntoArray(Line, TEXT("="));
+		if (Line.Num() != 2)
+			continue;
+		TTuple<FString,FString>* ptr = Details.FindByPredicate([&](const TTuple<FString,FString>& Item)
+		{
+			FString nk = Item.Key;
+			nk.ConvertTabsToSpacesInline(1);
+			nk.RemoveSpacesInline();
+			return nk.Equals(Line[0], ESearchCase::IgnoreCase);
+		});
+		if (!ptr)
+			return false;
+		if (!ptr->Value.Contains(Line[1]))
+			return false;
+	}
+	return true;
 }
