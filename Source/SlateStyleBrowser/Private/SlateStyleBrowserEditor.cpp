@@ -440,10 +440,8 @@ TSharedPtr<FSlateStyleData> SSlateStyleBrowserEditor::MakeSlateStyleData(const I
 	/*
 	 * Important: Get brushes last, so that DefaultBrushes don't interfere!
 	 */
-	
-	const FSlateBrush* Brush = SlateStyle->GetBrush(PropertyName);
-	// This is not ideal! Default brushes won't appear at all this way.
-	if (Brush && Brush != SlateStyle->GetDefaultBrush()) {
+	const FSlateBrush* Brush = SlateStyle->GetOptionalBrush(PropertyName, nullptr, nullptr);
+	if (Brush) {
 		StyleData = MakeShared<FSlateStyleBrush>();
 		StyleData->Initialize(Style, PropertyName, NAME_None, NAME_None);
 		return StyleData;
