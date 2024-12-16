@@ -1,6 +1,7 @@
 #include "DefaultSlateStyleDataProvider.h"
 
 #include "SlateStyleWidgetButton.h"
+#include "SlateStyleWidgetCarouselNavigation.h"
 #include "SlateStyleWidgetCheckBox.h"
 #include "SlateStyleWidgetComboBox.h"
 #include "SlateStyleWidgetComboButton.h"
@@ -14,23 +15,27 @@
 #include "SlateStyleWidgetSearchBox.h"
 #include "SlateStyleWidgetSlider.h"
 #include "SlateStyleWidgetSpinBox.h"
+#include "SlateStyleWidgetSplitter.h"
 #include "Interfaces/IPluginManager.h"
 
 #define DEFTYPES(OP) \
-	OP(TextBlock, FTextBlockStyle) \
 	OP(Button, FButtonStyle) \
+	OP(CheckBox, FCheckBoxStyle) \
 	OP(ComboBox, FComboBoxStyle) \
 	OP(ComboButton, FComboButtonStyle) \
-	OP(ProgressBar, FProgressBarStyle) \
-	OP(CheckBox, FCheckBoxStyle) \
-	OP(Slider, FSliderStyle) \
-	OP(ExpandableArea, FExpandableAreaStyle) \
-	OP(EditableTextBox, FEditableTextBoxStyle) \
 	OP(EditableText, FEditableTextStyle) \
+	OP(EditableTextBox, FEditableTextBoxStyle) \
+	OP(ExpandableArea, FExpandableAreaStyle) \
 	OP(Hyperlink, FHyperlinkStyle) \
-	OP(SpinBox, FSpinBoxStyle) \
+	OP(ProgressBar, FProgressBarStyle) \
 	OP(ScrollBar, FScrollBarStyle) \
 	OP(SearchBox, FSearchBoxStyle) \
+	OP(Slider, FSliderStyle) \
+	OP(SpinBox, FSpinBoxStyle) \
+	OP(Splitter, FSplitterStyle) \
+	OP(TextBlock, FTextBlockStyle) \
+	OP(CarouselNavigationButton, FWidgetCarouselNavigationButtonStyle) \
+	OP(CarouselNavigationBar, FWidgetCarouselNavigationBarStyle) \
 
 namespace DefaultSupportedTypes
 {

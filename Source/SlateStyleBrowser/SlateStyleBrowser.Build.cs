@@ -50,6 +50,7 @@ public class SlateStyleBrowser : ModuleRules
 				"EditorStyle",
 				"ApplicationCore",
 				"WorkspaceMenuStructure",
+				"WidgetCarousel",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

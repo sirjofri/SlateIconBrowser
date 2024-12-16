@@ -40,6 +40,8 @@ public:
 	{
 #define LOCTEXT_NAMESPACE "SlateStyleBrowser"
 		FText HelloWorld = LOCTEXT("Default.HelloWorld", "Hello, World!");
+		FText Left = LOCTEXT("Default.Left", "Left");
+		FText Right = LOCTEXT("Default.Right", "Right");
 #undef LOCTEXT_NAMESPACE
 	};
 	DefaultValuesStruct DefaultValues;
