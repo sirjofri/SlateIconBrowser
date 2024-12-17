@@ -31,6 +31,7 @@ class USlateStyleBrowserUserSettings : public UDeveloperSettings
 public:
 	USlateStyleBrowserUserSettings();
 	virtual void PostReloadConfig(class FProperty* PropertyThatWasLoaded) override;
+	virtual void PostInitProperties() override;;
 
 	void FillWithDefaultStyles();
 	void FillWithDefaultReplacements();
