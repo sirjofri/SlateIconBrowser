@@ -66,6 +66,8 @@ As with everything source-code related you are supposed to read it before you in
 * `Copy Styles`: Per type, set preset copy styles here.
 * `Readability Replacements`: Automatically replace text to enhance readability of copied code.
 
+The configuration is saved in the `EditorSettings` configuration file on your system, usually in `%localappdata%\UnrealEngine\5.x\Saved\Config\WindowsEditor\EditorSettings.ini`.
+
 ---
 
 # Source Code and License
